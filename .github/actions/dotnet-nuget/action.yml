@@ -1,0 +1,6 @@
+name: 'Compile & publish NuGet package'
+description: 'Compiles all projects in a solution, runs tests (*.Tests projects) and publishes non-test projects to NuGet and GitHub Package Registry.'
+author: 'ffMathy'
+runs:
+  using: 'node12'
+  main: 'lib/dotnet-nuget.js'
