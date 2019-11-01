@@ -1,4 +1,4 @@
-console.log('bazbaz');
+console.log('bazbaz', process.cwd(), __dirname, __filename);
 
 import glob from 'glob';
 
