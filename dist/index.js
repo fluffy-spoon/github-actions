@@ -1384,7 +1384,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 console.log('bazbaz');
 const glob_1 = __importDefault(__webpack_require__(402));
 console.log('foobar');
-glob_1.default("**/*.sln", {}, (err, files) => {
+glob_1.default("**/*", {}, (err, files) => {
     console.log('files?', err, files);
     for (let file of files) {
         console.log(file);

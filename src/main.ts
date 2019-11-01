@@ -4,7 +4,7 @@ import glob from 'glob';
 
 console.log('foobar');
 
-glob("**/*.sln", {}, (err, files) => {
+glob("**/*", {}, (err, files) => {
     console.log('files?', err, files);
 
     for(let file of files) {
