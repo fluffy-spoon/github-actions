@@ -1,1 +1,1 @@
-{"version":3,"file":"dotnet-nuget.js","sourceRoot":"","sources":["../src/dotnet-nuget.ts"],"names":[],"mappings":""}
+{"version":3,"file":"dotnet-nuget.js","sourceRoot":"","sources":["../src/dotnet-nuget.ts"],"names":[],"mappings":"AAEA,IAAI,CAAC,UAAU,EAAE,IAAI,EAAE,CAAC,GAAG,EAAE,KAAK;IAC9B,GAAG,CAAA,CAAC,GAAG,CAAC,IAAI,IAAI,KAAK,CAAC,CAAC,CAAC;QACpB,OAAO,CAAC,GAAG,CAAC,IAAI,CAAC,CAAC;IACtB,CAAC;AACL,CAAC,CAAC,CAAC"}

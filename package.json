@@ -19,6 +19,11 @@
   "dependencies": {
     "@actions/core": "^1.2.0",
     "@actions/exec": "^1.0.1",
-    "@actions/github": "^1.1.0"
+    "@actions/github": "^1.1.0",
+    "@actions/io": "^1.0.1",
+    "glob": "^7.1.5"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1"
   }
 }
