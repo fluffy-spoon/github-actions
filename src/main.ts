@@ -9,7 +9,9 @@ if(typeof workspacePath === "undefined")
 
 async function compileSolutionFile(solutionFile: string) {
     console.log('building', solutionFile);
-    await exec("dotnet", ["build", solutionFile]);
+    await exec("dotnet", ["build"], {
+        cwd: path.dirname(solutionFile)
+    });
 }
 
 async function globSearch(pattern: string) {
@@ -29,5 +31,5 @@ async function run() {
     }
 }
 
-run();
+run().catch(console.error);
 export default run; 
