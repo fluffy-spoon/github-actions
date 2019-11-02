@@ -1,4 +1,4 @@
-console.log('bazbaz', process.cwd(), __dirname, __filename);
+console.log('bazbaz', process.cwd(), __dirname, __filename, process.env.GITHUB_WORKSPACE);
 
 import glob from 'glob';
 
