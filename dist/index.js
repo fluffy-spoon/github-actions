@@ -1381,16 +1381,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('bazbaz', process.cwd(), __dirname, __filename, process.env.GITHUB_WORKSPACE);
 const glob_1 = __importDefault(__webpack_require__(402));
-console.log('foobar');
-glob_1.default("**/*", {}, (err, files) => {
+const path_1 = __importDefault(__webpack_require__(622));
+let workspacePath = process.env.GITHUB_WORKSPACE || './';
+glob_1.default(path_1.default.join(workspacePath, "**/*"), {}, (err, files) => {
     console.log('files?', err, files);
     for (let file of files) {
         console.log(file);
     }
 });
-console.log('donebuz');
 
 
 /***/ }),

@@ -1,15 +1,12 @@
-console.log('bazbaz', process.cwd(), __dirname, __filename, process.env.GITHUB_WORKSPACE);
-
 import glob from 'glob';
+import path from 'path';
 
-console.log('foobar');
+let workspacePath = process.env.GITHUB_WORKSPACE || './';
 
-glob("**/*", {}, (err, files) => {
+glob(path.join(workspacePath, "**/*"), {}, (err, files) => {
     console.log('files?', err, files);
 
     for(let file of files) {
         console.log(file);
     }
 });
-
-console.log('donebuz');
