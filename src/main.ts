@@ -3,13 +3,20 @@ import path from 'path';
 
 import { exec } from '@actions/exec';
 
-var workspacePath = process.env.GITHUB_WORKSPACE as string;
+const workspacePath = process.env.GITHUB_WORKSPACE as string;
 if(typeof workspacePath === "undefined")
     throw new Error('Could not find workspace path.');
 
 async function compileSolutionFile(solutionFile: string) {
     console.log('building', solutionFile);
     await exec("dotnet", ["build"], {
+        cwd: path.dirname(solutionFile)
+    });
+}
+
+async function testSolutionFile(solutionFile: string) {
+    console.log('testing', solutionFile);
+    await exec("dotnet", ["test"], {
         cwd: path.dirname(solutionFile)
     });
 }
@@ -24,11 +31,16 @@ async function globSearch(pattern: string) {
         }));
 }
 
-async function run() {
+async function handleDotNetSolutionFiles() {
     var solutionFiles = await globSearch("**/*.sln");
-    for(let solutionFile of solutionFiles) {
+    for (let solutionFile of solutionFiles) {
         await compileSolutionFile(solutionFile);
+        await testSolutionFile(solutionFile);
     }
+}
+
+async function run() {
+    await handleDotNetSolutionFiles();
 }
 
 run().catch(console.error);

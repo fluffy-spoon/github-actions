@@ -1979,12 +1979,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const glob_1 = __importDefault(__webpack_require__(402));
 const path_1 = __importDefault(__webpack_require__(622));
 const exec_1 = __webpack_require__(986);
-var workspacePath = process.env.GITHUB_WORKSPACE;
+const workspacePath = process.env.GITHUB_WORKSPACE;
 if (typeof workspacePath === "undefined")
     throw new Error('Could not find workspace path.');
 async function compileSolutionFile(solutionFile) {
     console.log('building', solutionFile);
     await exec_1.exec("dotnet", ["build"], {
+        cwd: path_1.default.dirname(solutionFile)
+    });
+}
+async function testSolutionFile(solutionFile) {
+    console.log('testing', solutionFile);
+    await exec_1.exec("dotnet", ["test"], {
         cwd: path_1.default.dirname(solutionFile)
     });
 }
@@ -1995,11 +2001,15 @@ async function globSearch(pattern) {
         return resolve(files);
     }));
 }
-async function run() {
+async function handleDotNetSolutionFiles() {
     var solutionFiles = await globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
         await compileSolutionFile(solutionFile);
+        await testSolutionFile(solutionFile);
     }
+}
+async function run() {
+    await handleDotNetSolutionFiles();
 }
 run().catch(console.error);
 exports.default = run;
