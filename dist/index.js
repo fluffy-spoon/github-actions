@@ -1984,7 +1984,9 @@ if (typeof workspacePath === "undefined")
     throw new Error('Could not find workspace path.');
 async function compileSolutionFile(solutionFile) {
     console.log('building', solutionFile);
-    await exec_1.exec("dotnet", [solutionFile, "build"]);
+    await exec_1.exec("dotnet", ["build"], {
+        cwd: path_1.default.dirname(solutionFile)
+    });
 }
 async function globSearch(pattern) {
     return new Promise((resolve, reject) => glob_1.default(path_1.default.join(workspacePath, pattern), {}, (err, files) => {
@@ -1999,7 +2001,7 @@ async function run() {
         await compileSolutionFile(solutionFile);
     }
 }
-run();
+run().catch(console.error);
 exports.default = run;
 
 
