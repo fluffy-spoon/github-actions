@@ -3687,7 +3687,7 @@ class SolutionFileParser {
             if (!match || match.length < 3)
                 continue;
             projects.push({
-                filePath: path_1.join(path_1.dirname(solutionFile), match[2]),
+                filePath: path_1.join(path_1.dirname(solutionFile), match[2]).replace(/\\/g, path_1.sep),
                 name: match[1]
             });
         }

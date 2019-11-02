@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { dirname, join } from 'path';
+import { dirname, join, sep } from 'path';
 
 export interface ProjectFile {
     filePath: string;
@@ -27,7 +27,7 @@ export default class SolutionFileParser {
             projects.push({
                 filePath: join(
                     dirname(solutionFile),
-                    match[2]),
+                    match[2]).replace(/\\/g, sep),
                 name: match[1]
             });
         }

@@ -22,10 +22,12 @@
     "@actions/exec": "^1.0.1",
     "@actions/github": "^1.1.0",
     "@actions/io": "^1.0.1",
-    "glob": "^7.1.5"
+    "glob": "^7.1.5",
+    "xml2js": "^0.4.22"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
+    "@types/xml2js": "^0.4.5",
     "@zeit/ncc": "^0.20.5",
     "typescript": "^3.6.4"
   }
