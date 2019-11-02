@@ -1,15 +1,29 @@
 import glob from 'glob';
 import path from 'path';
-import fs from 'fs';
+
+import exec from '@actions/exec';
 
 let workspacePath = process.env.GITHUB_WORKSPACE;
 if(!workspacePath)
     throw new Error('Could not find workspace path.');
 
-glob(path.join(workspacePath, "**/*.sln"), {}, (err, files) => {
-    console.log('files?', err, files);
+async function compileSolutionFile(filePath: string) {
 
-    for(let file of files) {
-        console.log(file);
-    }
-});
+}
+
+async function globSearch(pattern: string) {
+    return new Promise<string[]>((resolve, reject) => 
+        glob(pattern, {}, (err, files) => {
+            if(err)
+                return reject(err);
+
+            return resolve(files);
+        }));
+}
+
+// @ts-ignore
+var solutionFiles = await globSearch(path.join(workspacePath, "**/*.sln"));
+for(let solutionFile of solutionFiles) {
+    // @ts-ignore
+    await exec(`dotnet "${solutionFile}" build`);
+}
