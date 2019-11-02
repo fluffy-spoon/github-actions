@@ -1987,18 +1987,19 @@ async function compileSolutionFile(solutionFile) {
     await exec_1.exec("dotnet", [solutionFile, "build"]);
 }
 async function globSearch(pattern) {
-    return new Promise((resolve, reject) => glob_1.default(pattern, {}, (err, files) => {
+    return new Promise((resolve, reject) => glob_1.default(path_1.default.join(workspacePath, pattern), {}, (err, files) => {
         if (err)
             return reject(err);
         return resolve(files);
     }));
 }
 async function run() {
-    var solutionFiles = await globSearch(path_1.default.join(workspacePath, "**/*.sln"));
+    var solutionFiles = await globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
         await compileSolutionFile(solutionFile);
     }
 }
+run();
 exports.default = run;
 
 

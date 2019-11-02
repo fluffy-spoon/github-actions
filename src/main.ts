@@ -14,7 +14,7 @@ async function compileSolutionFile(solutionFile: string) {
 
 async function globSearch(pattern: string) {
     return new Promise<string[]>((resolve, reject) => 
-        glob(pattern, {}, (err, files) => {
+        glob(path.join(workspacePath, pattern), {}, (err, files) => {
             if(err)
                 return reject(err);
 
@@ -23,10 +23,11 @@ async function globSearch(pattern: string) {
 }
 
 async function run() {
-    var solutionFiles = await globSearch(path.join(workspacePath, "**/*.sln"));
+    var solutionFiles = await globSearch("**/*.sln");
     for(let solutionFile of solutionFiles) {
         await compileSolutionFile(solutionFile);
     }
 }
 
+run();
 export default run; 
