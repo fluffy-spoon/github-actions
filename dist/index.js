@@ -720,6 +720,17 @@ module.exports = require("os");
 
 /***/ }),
 
+/***/ 89:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.workspacePath = process.env.GITHUB_WORKSPACE;
+
+
+/***/ }),
+
 /***/ 93:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -1976,12 +1987,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const glob_1 = __importDefault(__webpack_require__(402));
+const dotnet_1 = __importDefault(__webpack_require__(216));
+async function run() {
+    await dotnet_1.default();
+}
+run().catch(console.error);
+exports.default = run;
+
+
+/***/ }),
+
+/***/ 216:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = __importDefault(__webpack_require__(622));
 const exec_1 = __webpack_require__(986);
-const workspacePath = process.env.GITHUB_WORKSPACE;
-if (typeof workspacePath === "undefined")
-    throw new Error('Could not find workspace path.');
+const helpers_1 = __webpack_require__(872);
+const solution_file_parser_1 = __importDefault(__webpack_require__(493));
 async function compileSolutionFile(solutionFile) {
     console.log('building', solutionFile);
     await exec_1.exec("dotnet", ["build"], {
@@ -2006,26 +2034,17 @@ async function packSolutionFile(solutionFile) {
         cwd: path_1.default.dirname(solutionFile)
     });
 }
-async function globSearch(pattern) {
-    return new Promise((resolve, reject) => glob_1.default(path_1.default.join(workspacePath, pattern), {}, (err, files) => {
-        if (err)
-            return reject(err);
-        return resolve(files);
-    }));
-}
-async function handleDotNetSolutionFiles() {
-    var solutionFiles = await globSearch("**/*.sln");
+async function handleDotNet() {
+    var solutionFiles = await helpers_1.globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
+        let projectFiles = solution_file_parser_1.default.getProjects(solutionFile);
+        console.log('projects detected', solutionFile, projectFiles);
         await compileSolutionFile(solutionFile);
         await testSolutionFile(solutionFile);
         await packSolutionFile(solutionFile);
     }
 }
-async function run() {
-    await handleDotNetSolutionFiles();
-}
-run().catch(console.error);
-exports.default = run;
+exports.default = handleDotNet;
 
 
 /***/ }),
@@ -3642,6 +3661,44 @@ Glob.prototype._stat2 = function (f, abs, er, stat, cb) {
 
 /***/ }),
 
+/***/ 493:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = __importDefault(__webpack_require__(747));
+const path_1 = __webpack_require__(622);
+class SolutionFileParser {
+    static getProjects(solutionFile) {
+        let guidRegex = `\\{[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\}`;
+        let projectLineRegex = new RegExp(`Project\\(\"${guidRegex}\"\\) = \"(.+)\", \"(.+)\", \"${guidRegex}\"`);
+        let lines = fs_1.default
+            .readFileSync(solutionFile)
+            .toString()
+            .replace('\r', '')
+            .split('\n');
+        let projects = new Array();
+        for (let line of lines) {
+            let match = projectLineRegex.exec(line);
+            if (!match || match.length < 3)
+                continue;
+            projects.push({
+                filePath: path_1.join(path_1.dirname(solutionFile), match[2]),
+                name: match[1]
+            });
+        }
+        return projects;
+    }
+}
+exports.default = SolutionFileParser;
+
+
+/***/ }),
+
 /***/ 614:
 /***/ (function(module) {
 
@@ -4085,6 +4142,30 @@ function childrenIgnored (self, path) {
     return !!(item.gmatcher && item.gmatcher.match(path))
   })
 }
+
+
+/***/ }),
+
+/***/ 872:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const environment_1 = __webpack_require__(89);
+const glob_1 = __importDefault(__webpack_require__(402));
+const path_1 = __webpack_require__(622);
+async function globSearch(pattern) {
+    return new Promise((resolve, reject) => glob_1.default(path_1.join(environment_1.workspacePath, pattern), {}, (err, files) => {
+        if (err)
+            return reject(err);
+        return resolve(files);
+    }));
+}
+exports.globSearch = globSearch;
 
 
 /***/ }),

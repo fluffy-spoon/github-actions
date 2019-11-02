@@ -1,0 +1,1 @@
+export const workspacePath = process.env.GITHUB_WORKSPACE as string;
