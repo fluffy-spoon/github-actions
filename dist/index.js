@@ -1382,8 +1382,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const glob_1 = __importDefault(__webpack_require__(402));
+const fs_1 = __importDefault(__webpack_require__(747));
 let workspacePath = process.env.GITHUB_WORKSPACE || './';
 console.log('root', workspacePath);
+fs_1.default.readdirSync('/').forEach(file => {
+    console.log('rooty', file);
+});
+fs_1.default.readdirSync('~/').forEach(file => {
+    console.log('mooty', file);
+});
+fs_1.default.readdirSync('../').forEach(file => {
+    console.log('looty', file);
+});
 glob_1.default("~/**/*", {}, (err, files) => {
     console.log('files?', err, files);
     for (let file of files) {
