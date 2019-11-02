@@ -2,22 +2,11 @@ import glob from 'glob';
 import path from 'path';
 import fs from 'fs';
 
-let workspacePath = process.env.GITHUB_WORKSPACE || './';
-console.log('root', workspacePath);
+let workspacePath = process.env.GITHUB_WORKSPACE;
+if(!workspacePath)
+    throw new Error('Could not find workspace path.');
 
-fs.readdirSync('/').forEach(file => {
-  console.log('rooty', file);
-});
-
-fs.readdirSync(workspacePath).forEach(file => {
-  console.log('looty', file);
-});
-
-fs.readdirSync('/home').forEach(file => {
-  console.log('mooty', file);
-});
-
-glob("~/**/*", {}, (err, files) => {
+glob(path.join(workspacePath, "**/*.sln"), {}, (err, files) => {
     console.log('files?', err, files);
 
     for(let file of files) {
