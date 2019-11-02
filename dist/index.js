@@ -1994,6 +1994,18 @@ async function testSolutionFile(solutionFile) {
         cwd: path_1.default.dirname(solutionFile)
     });
 }
+async function packSolutionFile(solutionFile) {
+    console.log('packing', solutionFile);
+    await exec_1.exec("dotnet", [
+        "pack",
+        "--output",
+        __dirname,
+        "--include-symbols",
+        "p:SymbolPackageFormat=snupkg"
+    ], {
+        cwd: path_1.default.dirname(solutionFile)
+    });
+}
 async function globSearch(pattern) {
     return new Promise((resolve, reject) => glob_1.default(path_1.default.join(workspacePath, pattern), {}, (err, files) => {
         if (err)
@@ -2006,6 +2018,7 @@ async function handleDotNetSolutionFiles() {
     for (let solutionFile of solutionFiles) {
         await compileSolutionFile(solutionFile);
         await testSolutionFile(solutionFile);
+        await packSolutionFile(solutionFile);
     }
 }
 async function run() {
