@@ -1384,6 +1384,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const glob_1 = __importDefault(__webpack_require__(402));
 const path_1 = __importDefault(__webpack_require__(622));
 let workspacePath = process.env.GITHUB_WORKSPACE || './';
+console.log('root', workspacePath);
 glob_1.default(path_1.default.join(workspacePath, "**/*"), {}, (err, files) => {
     console.log('files?', err, files);
     for (let file of files) {
