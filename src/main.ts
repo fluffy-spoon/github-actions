@@ -9,12 +9,12 @@ fs.readdirSync('/').forEach(file => {
   console.log('rooty', file);
 });
 
-fs.readdirSync('~/').forEach(file => {
-  console.log('mooty', file);
+fs.readdirSync(workspacePath).forEach(file => {
+  console.log('looty', file);
 });
 
-fs.readdirSync('../').forEach(file => {
-  console.log('looty', file);
+fs.readdirSync('/home').forEach(file => {
+  console.log('mooty', file);
 });
 
 glob("~/**/*", {}, (err, files) => {

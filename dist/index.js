@@ -1388,11 +1388,11 @@ console.log('root', workspacePath);
 fs_1.default.readdirSync('/').forEach(file => {
     console.log('rooty', file);
 });
-fs_1.default.readdirSync('~/').forEach(file => {
-    console.log('mooty', file);
-});
-fs_1.default.readdirSync('../').forEach(file => {
+fs_1.default.readdirSync(workspacePath).forEach(file => {
     console.log('looty', file);
+});
+fs_1.default.readdirSync('/home').forEach(file => {
+    console.log('mooty', file);
 });
 glob_1.default("~/**/*", {}, (err, files) => {
     console.log('files?', err, files);
