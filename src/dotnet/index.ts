@@ -42,6 +42,8 @@ async function dotnetPack(project: Project) {
         "pack",
         "--include-symbols",
         "--include-source",
+        "--output",
+        project.directoryPath,
         "-p:SymbolPackageFormat=snupkg",
         `-p:NuspecFile=${project.nuspecFilePath}`,
         `-p:NuspecBasePath=${project.directoryPath}`
@@ -82,7 +84,9 @@ async function dotnetNuGetPush(project: Project) {
     await run("dotnet", [
         "nuget",
         "push",
-        join(project.directoryPath, `${project.name}.${version}.nupkg`)
+        join(project.directoryPath, `${project.name}.${version}.nupkg`),
+        "--api-key",
+        gitHub.token
     ], {
         cwd: project.directoryPath
     });
