@@ -14,7 +14,7 @@ async function gitCommand(args: string[]) {
 async function gitCheckout() {
     let github = await getGitHubContext();
 
-    await gitCommand(['clone', github.repository.git_url]);
+    await gitCommand(['clone', github.repository.clone_url]);
 
     // await gitCommand(['init', github.environment.WORKSPACE]);
     // await gitCommand(['remote', 'add', 'origin', github.repository.html_url]);
