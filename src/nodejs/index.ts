@@ -16,7 +16,7 @@ async function npmPublish(project: NodeJsPackage) {
 export default async function handleNodeJs() {
     logDebug('scanning for nodejs projects');
 
-    var packageJsFiles = await globSearch("**/*.package.json", ["**/node_modules/**"]);
+    var packageJsFiles = await globSearch("**/package.json", ["**/node_modules/**"]);
     packageJsFiles = packageJsFiles
         .sort((a, b) => b.length - a.length)
         .filter(x => !!packageJsFiles.find(y => y !== x && y.indexOf(x) > -1));

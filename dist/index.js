@@ -575,7 +575,7 @@ async function npmPublish(project) {
 }
 async function handleNodeJs() {
     helpers_1.logDebug('scanning for nodejs projects');
-    var packageJsFiles = await helpers_1.globSearch("**/*.package.json", ["**/node_modules/**"]);
+    var packageJsFiles = await helpers_1.globSearch("**/package.json", ["**/node_modules/**"]);
     packageJsFiles = packageJsFiles
         .sort((a, b) => b.length - a.length)
         .filter(x => !!packageJsFiles.find(y => y !== x && y.indexOf(x) > -1));
