@@ -132,6 +132,8 @@ async function generateNuspecFileForProject(project: Project) {
 }
 
 export default async function handleDotNet() {
+    console.log('scanning for solutions');
+
     var solutionFiles = await globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
         let projects = await SolutionFileParser.getProjects(solutionFile);
@@ -153,19 +155,5 @@ export default async function handleDotNet() {
 
         for(let project of nonTestProjects)
             console.log('todo-push', project.directoryPath);
-
-        let nugetFiles = await globSearch(join(__dirname, '*.nupkg'));
-        for(let nugetFile of nugetFiles) {
-            let fileName = basename(nugetFile, extname(nugetFile));
-
-            let matchingProject = projects.find(x => x.name === fileName);
-            if(!matchingProject)
-                return fail('Could not find a project called ' + fileName + ' in the solution, inferred from the .nupkg file.');
-
-            if(matchingProject.isTestProject)
-                continue;
-
-            await dotnetNuGetPush(nugetFile);
-        }
     }
 }

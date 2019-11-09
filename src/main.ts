@@ -5,5 +5,5 @@ async function run() {
     await handleDotNet();
 }
 
-run().catch(fail);
+run().catch((e) => Promise.reject(fail(e && e.toString())));
 export default run; 

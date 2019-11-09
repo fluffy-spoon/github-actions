@@ -5299,7 +5299,7 @@ const helpers_1 = __webpack_require__(872);
 async function run() {
     await dotnet_1.default();
 }
-run().catch(helpers_1.fail);
+run().catch((e) => Promise.reject(helpers_1.fail(e && e.toString())));
 exports.default = run;
 
 
@@ -5879,6 +5879,7 @@ async function generateNuspecFileForProject(project) {
     fs_1.writeFileSync(nuspecPath, newNuspecContents);
 }
 async function handleDotNet() {
+    console.log('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
         let projects = await solution_file_parser_1.default.getProjects(solutionFile);
@@ -5896,16 +5897,6 @@ async function handleDotNet() {
         }
         for (let project of nonTestProjects)
             console.log('todo-push', project.directoryPath);
-        let nugetFiles = await helpers_1.globSearch(path_1.join(__dirname, '*.nupkg'));
-        for (let nugetFile of nugetFiles) {
-            let fileName = path_1.basename(nugetFile, path_1.extname(nugetFile));
-            let matchingProject = projects.find(x => x.name === fileName);
-            if (!matchingProject)
-                return helpers_1.fail('Could not find a project called ' + fileName + ' in the solution, inferred from the .nupkg file.');
-            if (matchingProject.isTestProject)
-                continue;
-            await dotnetNuGetPush(nugetFile);
-        }
     }
 }
 exports.default = handleDotNet;
