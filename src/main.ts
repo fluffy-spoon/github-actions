@@ -14,11 +14,13 @@ async function gitCommand(args: string[]) {
 async function gitCheckout() {
     let github = await getGitHubContext();
 
-    await gitCommand(['init', github.environment.WORKSPACE]);
-    await gitCommand(['remote', 'add', 'origin', github.repository.html_url]);
-    await gitCommand(['config', 'gc.auto', '0']);
-    await gitCommand(['-c', 'http.extraheader="AUTHORIZATION: basic ' + github.token + '"', 'fetch', '--tags', '--prune', '--progress', '--no-recurse-submodules', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
-    await gitCommand(['checkout', '--progress', '--force', github.environment.SHA]);
+    await gitCommand(['clone', github.repository.git_url]);
+
+    // await gitCommand(['init', github.environment.WORKSPACE]);
+    // await gitCommand(['remote', 'add', 'origin', github.repository.html_url]);
+    // await gitCommand(['config', 'gc.auto', '0']);
+    // await gitCommand(['-c', 'http.extraheader="AUTHORIZATION: basic ' + github.token + '"', 'fetch', '--tags', '--prune', '--progress', '--no-recurse-submodules', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
+    // await gitCommand(['checkout', '--progress', '--force', github.environment.SHA]);
 }
 
 async function run() {
