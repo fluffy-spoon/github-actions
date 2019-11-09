@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { basename } from "path";
+import { dirname } from "path";
 
 export type DependencyVersion = string;
 
@@ -47,7 +47,7 @@ export default class PackageJsonParser {
         let packageJson = JSON.parse(readFileSync(filePath).toString()) as PackageJson;
         return {
             packageJson,
-            directoryPath: basename(filePath),
+            directoryPath: dirname(filePath),
             packageJsonFilePath: filePath,
             hasBuildCommand: 'build' in packageJson.scripts,
             hasTestCommand: 'test' in packageJson.scripts

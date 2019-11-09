@@ -5721,7 +5721,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip1";
+        const unzipPath = __webpack_require__.ab + "unzip";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
@@ -5926,7 +5926,7 @@ class PackageJsonParser {
         let packageJson = JSON.parse(fs_1.readFileSync(filePath).toString());
         return {
             packageJson,
-            directoryPath: path_1.basename(filePath),
+            directoryPath: path_1.dirname(filePath),
             packageJsonFilePath: filePath,
             hasBuildCommand: 'build' in packageJson.scripts,
             hasTestCommand: 'test' in packageJson.scripts
@@ -19826,7 +19826,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip";
+        const unzipPath = __webpack_require__.ab + "unzip1";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
