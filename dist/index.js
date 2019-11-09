@@ -579,7 +579,7 @@ async function handleNodeJs() {
     helpers_1.logDebug('nodejs projects found', packageJsFiles);
     packageJsFiles = packageJsFiles
         .sort((a, b) => b.length - a.length)
-        .filter(x => !!packageJsFiles.find(y => y !== x && y.indexOf(x) > -1));
+        .filter(x => !!packageJsFiles.find(y => y === x || y.indexOf(x) > -1));
     helpers_1.logDebug('nodejs projects filtered', packageJsFiles);
     for (let packageJsFile of packageJsFiles) {
         let project = package_json_parser_1.default.readPackage(packageJsFile);

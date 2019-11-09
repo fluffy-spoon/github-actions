@@ -21,7 +21,7 @@ export default async function handleNodeJs() {
 
     packageJsFiles = packageJsFiles
         .sort((a, b) => b.length - a.length)
-        .filter(x => !!packageJsFiles.find(y => y !== x && y.indexOf(x) > -1));
+        .filter(x => !!packageJsFiles.find(y => y === x || y.indexOf(x) > -1));
 
     logDebug('nodejs projects filtered', packageJsFiles);
 
