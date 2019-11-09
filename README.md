@@ -1,1 +1,2 @@
-# github-actions
+# Compiling
+`npm run build`
