@@ -2266,7 +2266,7 @@ async function getGitHubContext() {
         console.log('context initialized', context);
         return context;
     });
-    return cachedContextPromise;
+    return await cachedContextPromise;
 }
 exports.getGitHubContext = getGitHubContext;
 
@@ -5886,6 +5886,7 @@ async function generateNuspecFileForProject(project) {
 async function handleDotNet() {
     console.log('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
+    console.log('solutions found', solutionFiles);
     for (let solutionFile of solutionFiles) {
         let projects = await solution_file_parser_1.default.getProjects(solutionFile);
         console.log('projects detected', solutionFile, projects);

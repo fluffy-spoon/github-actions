@@ -88,5 +88,5 @@ export async function getGitHubContext(): Promise<GitHubContext> {
         return context;
     });
 
-    return cachedContextPromise;
+    return await cachedContextPromise;
 }

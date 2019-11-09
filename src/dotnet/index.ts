@@ -137,6 +137,8 @@ export default async function handleDotNet() {
     console.log('scanning for solutions');
 
     var solutionFiles = await globSearch("**/*.sln");
+    console.log('solutions found', solutionFiles);
+
     for (let solutionFile of solutionFiles) {
         let projects = await SolutionFileParser.getProjects(solutionFile);
         console.log('projects detected', solutionFile, projects);
