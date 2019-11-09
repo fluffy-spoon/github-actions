@@ -3220,7 +3220,7 @@ async function handleDotNet() {
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
         let projectFiles = await solution_file_parser_1.default.getProjects(solutionFile);
-        console.log('projects detected', solutionFile, projectFiles);
+        console.log('projects detected', solutionFile, JSON.stringify(projectFiles));
         await compileSolutionFile(solutionFile);
         await testSolutionFile(solutionFile);
         await packSolutionFile(solutionFile);
