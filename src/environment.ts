@@ -38,7 +38,7 @@ export async function getGitHubContext(): Promise<GitHubContext> {
     console.log('fetching context');
 
     cachedContextPromise = new Promise<GitHubContext>(async () => {
-        const token = getInput('gitHubKey');
+        const token = getInput('gitHubToken');
 
         let environment: KnownGitHubEnvironmentKeyObject = {} as any;
         for(let key in KnownGitHubEnvironmentKey)

@@ -2230,7 +2230,7 @@ async function getGitHubContext() {
         return cachedContextPromise;
     console.log('fetching context');
     cachedContextPromise = new Promise(async () => {
-        const token = core_1.getInput('gitHubKey');
+        const token = core_1.getInput('gitHubToken');
         let environment = {};
         for (let key in KnownGitHubEnvironmentKey)
             environment[key] = core_1.getInput('GITHUB_' + key);
