@@ -15,7 +15,7 @@ async function gitCheckout() {
     let github = await getGitHubContext();
 
     await gitCommand(['init', github.environment.WORKSPACE]);
-    await gitCommand(['remote', 'add', 'origin', github.repository.git_url]);
+    await gitCommand(['remote', 'add', 'origin', github.repository.html_url]);
     await gitCommand(['config', 'gc.auto', '0']);
     await gitCommand(['fetch', '--tags', '--prune', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
     await gitCommand(['checkout', '--progress', '--force', github.environment.SHA]);
