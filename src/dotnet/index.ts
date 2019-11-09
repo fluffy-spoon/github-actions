@@ -1,4 +1,6 @@
-import { join, basename, extname, dirname } from 'path';
+console.log('index.ts');
+
+import { join, dirname } from 'path';
 
 import { exec } from '@actions/exec';
 

@@ -1,3 +1,5 @@
+console.log('project-file-parser.ts');
+
 import xml2js from 'xml2js';
 import fs from 'fs';
 import { basename, extname, dirname, join } from 'path';

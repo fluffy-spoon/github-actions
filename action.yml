@@ -1,5 +1,5 @@
 name: 'Compile & publish NuGet package'
-description: 'Compiles all projects in a solution, runs tests (*.Tests projects) and publishes non-test projects to NuGet and GitHub Package Registry.'
+description: 'One-step CI/DI as well as deployment for C# and NodeJS projects.'
 author: 'ffMathy'
 inputs:
   gitHubToken:

@@ -1,10 +1,12 @@
+console.log('helpers.ts');
+
 import glob from 'glob';
 import fs from 'fs';
 import http from 'http';
 
 import { join } from "path";
 import { getGitHubContext } from './environment';
-// import { setFailed } from '@actions/core';
+import { setFailed } from '@actions/core';
 
 export async function globSearch(pattern: string) {
     let context = await getGitHubContext();
@@ -35,6 +37,6 @@ export async function downloadFile(localFilePath: string, url: string) {
 
 export function fail(message: string) {
     console.error(message);
-    // setFailed(message);
+    setFailed(message);
     throw new Error(message);
 }

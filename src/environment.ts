@@ -1,3 +1,5 @@
+console.log('environment.ts');
+
 import {GitHub} from '@actions/github';
 import { getInput } from '@actions/core';
 import { ReposGetResponse, UsersGetByUsernameResponse, ReposListCommitsResponseItem, ReposGetLatestReleaseResponse } from '@octokit/rest';

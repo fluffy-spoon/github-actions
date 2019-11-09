@@ -1,3 +1,5 @@
+console.log('solution-file-parser.ts');
+
 import fs from 'fs';
 import { dirname, join, sep } from 'path';
 import ProjectFileParser, { Project } from './project-file-parser';

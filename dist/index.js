@@ -2207,6 +2207,7 @@ module.exports = require("os");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('environment.ts');
 const github_1 = __webpack_require__(469);
 const core_1 = __webpack_require__(470);
 var KnownGitHubEnvironmentKey;
@@ -5296,6 +5297,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('main.ts');
 const dotnet_1 = __importDefault(__webpack_require__(216));
 const helpers_1 = __webpack_require__(872);
 async function run() {
@@ -5774,6 +5776,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('index.ts');
 const path_1 = __webpack_require__(622);
 const exec_1 = __webpack_require__(986);
 const solution_file_parser_1 = __importDefault(__webpack_require__(493));
@@ -9081,6 +9084,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('project-file-parser.ts');
 const xml2js_1 = __importDefault(__webpack_require__(992));
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __webpack_require__(622);
@@ -13572,6 +13576,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('solution-file-parser.ts');
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __webpack_require__(622);
 const project_file_parser_1 = __importDefault(__webpack_require__(316));
@@ -23985,12 +23990,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+console.log('helpers.ts');
 const glob_1 = __importDefault(__webpack_require__(120));
 const fs_1 = __importDefault(__webpack_require__(747));
 const http_1 = __importDefault(__webpack_require__(605));
 const path_1 = __webpack_require__(622);
 const environment_1 = __webpack_require__(89);
-// import { setFailed } from '@actions/core';
+const core_1 = __webpack_require__(470);
 async function globSearch(pattern) {
     let context = await environment_1.getGitHubContext();
     return new Promise((resolve, reject) => glob_1.default(path_1.join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
@@ -24018,7 +24024,7 @@ async function downloadFile(localFilePath, url) {
 exports.downloadFile = downloadFile;
 function fail(message) {
     console.error(message);
-    // setFailed(message);
+    core_1.setFailed(message);
     throw new Error(message);
 }
 exports.fail = fail;
