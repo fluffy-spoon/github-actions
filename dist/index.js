@@ -5816,23 +5816,7 @@ async function dotnetPack(project) {
     });
 }
 async function dotnetNuGetPush(project) {
-    console.log('adding package source', project.nuspecFilePath);
     let gitHub = await environment_1.getGitHubContext();
-    await run("dotnet", [
-        "nuget",
-        "sources",
-        "add",
-        "-Name",
-        "GPR",
-        "-Source",
-        `https://nuget.pkg.github.com/${gitHub.owner.login}/index.json`,
-        "-UserName",
-        gitHub.repository.owner.login,
-        "-Password",
-        gitHub.token
-    ], {
-        cwd: project.directoryPath
-    });
     let nugetConfigContents = `<?xml version="1.0" encoding="utf-8"?>
         <configuration>
         <config>
