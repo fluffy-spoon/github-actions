@@ -25,7 +25,7 @@ async function packSolutionFile(solutionFile: string) {
         "--output",
         __dirname,
         "--include-symbols",
-        "p:SymbolPackageFormat=snupkg"
+        "-p:SymbolPackageFormat=snupkg"
     ], {
         cwd: path.dirname(solutionFile)
     });

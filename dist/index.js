@@ -3211,7 +3211,7 @@ async function packSolutionFile(solutionFile) {
         "--output",
         __dirname,
         "--include-symbols",
-        "p:SymbolPackageFormat=snupkg"
+        "-p:SymbolPackageFormat=snupkg"
     ], {
         cwd: path_1.default.dirname(solutionFile)
     });
