@@ -23,24 +23,26 @@
     "@actions/exec": "^1.0.1",
     "@actions/github": "^1.1.0",
     "@actions/io": "^1.0.1",
-    "glob": "^7.1.6",
-    "xml2js": "^0.4.22",
     "@actions/tool-cache": "^1.0.0",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.6",
     "semver": "^6.1.1",
-    "typed-rest-client": "1.5.0"
+    "typed-rest-client": "1.5.0",
+    "xml2js": "^0.4.22"
   },
   "devDependencies": {
+    "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
-    "@types/xml2js": "^0.4.5",
-    "@zeit/ncc": "^0.20.5",
-    "typescript": "^3.7.2",
     "@types/jest": "^24.0.13",
     "@types/node": "^12.0.4",
     "@types/semver": "^6.0.0",
+    "@types/xml2js": "^0.4.5",
+    "@zeit/ncc": "^0.20.5",
     "husky": "^2.3.0",
     "jest": "^24.8.0",
     "jest-circus": "^24.7.1",
     "prettier": "^1.17.1",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.7.2"
   }
 }

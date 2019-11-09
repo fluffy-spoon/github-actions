@@ -1,4 +1,4 @@
-import { join, dirname } from 'path';
+import { join, dirname, resolve } from 'path';
 
 import SolutionFileParser from './solution-file-parser';
 import xml2js from 'xml2js';
@@ -6,8 +6,9 @@ import xml2js from 'xml2js';
 import { getGitHubContext } from '../environment';
 import { globSearch, logDebug, runProcess } from '../helpers';
 import { Project } from './project-file-parser';
-import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
 import { error } from '@actions/core';
+import { copy } from 'fs-extra';
 
 async function dotnetBuild(solutionFile: string) {
     logDebug('building', solutionFile);
@@ -165,8 +166,7 @@ async function getProjectVersion(project: Project) {
 export default async function handleDotNet() {
     logDebug('installing dotnet');
 
-    let dotnetInstaller = await import('./setup-dotnet/src/installer');
-    await new dotnetInstaller.DotnetCoreInstaller('3.0.100').installDotnet();
+    await installDotNet();
 
     logDebug('scanning for solutions');
 
@@ -197,4 +197,13 @@ export default async function handleDotNet() {
             }
         }
     }
+}
+
+async function installDotNet() {
+    await copy(
+        join(__dirname, '..', 'src', 'dotnet', 'setup-dotnet', 'externals'),
+        join(__dirname, '..', 'externals'));
+
+    let dotnetInstaller = await import('./setup-dotnet/src/installer');
+    await new dotnetInstaller.DotnetCoreInstaller('3.0.100').installDotnet();
 }
