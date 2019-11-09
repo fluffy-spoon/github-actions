@@ -36,6 +36,7 @@ async function dotnetTest(solutionFile: string) {
 
 async function dotnetPack(project: Project) {
     console.log('packing', project.csprojFilePath);
+    await generateNuspecFileForProject(project);
 
     await run("dotnet", [
         "pack",
@@ -68,6 +69,28 @@ async function dotnetNuGetPush(project: Project) {
     ], {
         cwd: project.directoryPath
     });
+
+    let nugetConfigContents = `<?xml version="1.0" encoding="utf-8"?>
+        <configuration>
+        <config>
+            <add key="DefaultPushSource" value="CustomFeed" />
+        </config>
+        <packageSources>
+            <add key="CustomFeed" value="https://nuget.pkg.github.com/${gitHub.owner.login}/index.json" />
+        </packageSources>
+        <packageSourceCredentials>
+            <CustomFeed>
+                <add key="Username" value="${gitHub.repository.owner.login}" />
+                <add key="ClearTextPassword" value="${gitHub.token}" />
+            </CustomFeed>
+        </packageSourceCredentials>
+        </configuration>`;
+
+        console.log('writing nuget.config', nugetConfigContents);
+
+    writeFileSync(
+        join(project.directoryPath, 'nuget.config'),
+        nugetConfigContents);
     
     console.log('publishing package', project.nuspecFilePath);
 
@@ -76,9 +99,7 @@ async function dotnetNuGetPush(project: Project) {
     await run("dotnet", [
         "nuget",
         "push",
-        join(project.directoryPath, `${project.name}.${version}.nupkg`),
-        "-Source",
-        "GPR"
+        join(project.directoryPath, `${project.name}.${version}.nupkg`)
     ], {
         cwd: project.directoryPath
     });
@@ -169,8 +190,6 @@ export default async function handleDotNet() {
 
         let nonTestProjects = projects.filter(x => !x.isTestProject);
         for(let project of nonTestProjects) {
-            await generateNuspecFileForProject(project);
-
             await dotnetBuild(project.csprojFilePath);
             await dotnetPack(project);
         }
