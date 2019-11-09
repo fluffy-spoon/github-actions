@@ -41,8 +41,16 @@ export async function getGitHubContext(): Promise<GitHubContext> {
         const token = getInput('gitHubToken');
 
         let environment: KnownGitHubEnvironmentKeyObject = {} as any;
-        for(let key in KnownGitHubEnvironmentKey)
-            environment[key] = getInput('GITHUB_' + key);
+        for(let key in KnownGitHubEnvironmentKey) {
+            if(!isNaN(+key))
+                continue;
+
+            let value = process.env['GITHUB_' + key];
+            if(!value)
+                continue;
+
+            environment[key] = value;
+        }
 
         let [owner, repo] = environment.REPOSITORY.split('/');
 

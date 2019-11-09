@@ -2232,8 +2232,14 @@ async function getGitHubContext() {
     cachedContextPromise = new Promise(async () => {
         const token = core_1.getInput('gitHubToken');
         let environment = {};
-        for (let key in KnownGitHubEnvironmentKey)
-            environment[key] = core_1.getInput('GITHUB_' + key);
+        for (let key in KnownGitHubEnvironmentKey) {
+            if (!isNaN(+key))
+                continue;
+            let value = process.env['GITHUB_' + key];
+            if (!value)
+                continue;
+            environment[key] = value;
+        }
         let [owner, repo] = environment.REPOSITORY.split('/');
         console.log('initializing context', environment, token.length);
         let client = new github_1.GitHub(token);
