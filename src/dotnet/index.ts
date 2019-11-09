@@ -9,6 +9,7 @@ import { Project } from './project-file-parser';
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'fs';
 import { error } from '@actions/core';
 import { copy } from 'fs-extra';
+import klawSync from 'klaw-sync';
 
 async function dotnetBuild(solutionFile: string) {
     logDebug('building', solutionFile);
@@ -200,7 +201,7 @@ export default async function handleDotNet() {
 }
 
 async function installDotNet() {
-    logDebug('installing dotnet', __dirname);
+    logDebug('installing dotnet', __dirname, klawSync(join(__dirname, '..')));
 
     await copy(
         join(__dirname, '..', 'src', 'dotnet', 'setup-dotnet', 'externals'),

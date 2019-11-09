@@ -7036,6 +7036,7 @@ const helpers_1 = __webpack_require__(872);
 const fs_1 = __webpack_require__(747);
 const core_1 = __webpack_require__(393);
 const fs_extra_1 = __webpack_require__(226);
+const klaw_sync_1 = __importDefault(__webpack_require__(502));
 async function dotnetBuild(solutionFile) {
     helpers_1.logDebug('building', solutionFile);
     await helpers_1.runProcess("dotnet", ["build"], {
@@ -7184,7 +7185,7 @@ async function handleDotNet() {
 }
 exports.default = handleDotNet;
 async function installDotNet() {
-    helpers_1.logDebug('installing dotnet', __dirname);
+    helpers_1.logDebug('installing dotnet', __dirname, klaw_sync_1.default(path_1.join(__dirname, '..')));
     await fs_extra_1.copy(path_1.join(__dirname, '..', 'src', 'dotnet', 'setup-dotnet', 'externals'), path_1.join(__dirname, '..', 'externals'));
     let dotnetInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
     await new dotnetInstaller.DotnetCoreInstaller('3.0.100').installDotnet();
@@ -16966,7 +16967,42 @@ function graphql (request, query, options) {
 
 /***/ }),
 /* 501 */,
-/* 502 */,
+/* 502 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+const fs = __webpack_require__(598)
+const path = __webpack_require__(622)
+
+function klawSync (dir, opts, ls) {
+  if (!ls) {
+    ls = []
+    dir = path.resolve(dir)
+    opts = opts || {}
+    opts.fs = opts.fs || fs
+    if (opts.depthLimit > -1) opts.rootDepth = dir.split(path.sep).length + 1
+  }
+  const paths = opts.fs.readdirSync(dir).map(p => dir + path.sep + p)
+  for (var i = 0; i < paths.length; i += 1) {
+    const pi = paths[i]
+    const st = opts.fs.statSync(pi)
+    const item = {path: pi, stats: st}
+    const isUnderDepthLimit = (!opts.rootDepth || pi.split(path.sep).length - opts.rootDepth < opts.depthLimit)
+    const filterResult = opts.filter ? opts.filter(item) : true
+    const isDir = st.isDirectory()
+    const shouldAdd = filterResult && (isDir ? !opts.nodir : !opts.nofile)
+    const shouldTraverse = isDir && isUnderDepthLimit && (opts.traverseAll || filterResult)
+    if (shouldAdd) ls.push(item)
+    if (shouldTraverse) ls = klawSync(pi, opts, ls)
+  }
+  return ls
+}
+
+module.exports = klawSync
+
+
+/***/ }),
 /* 503 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
