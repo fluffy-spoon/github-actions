@@ -1,8 +1,7 @@
-console.log('solution-file-parser.ts');
-
 import fs from 'fs';
 import { dirname, join, sep } from 'path';
 import ProjectFileParser, { Project } from './project-file-parser';
+import { logDebug } from '../helpers';
 
 export default class SolutionFileParser {
     static async getProjects(solutionFile: string) {
@@ -22,7 +21,7 @@ export default class SolutionFileParser {
             if(!match || match.length < 3)
                 continue;
 
-            console.log('detected project from solution file', solutionFile, match);
+            logDebug('detected project from solution file', solutionFile, match);
 
             let projectFilePath = join(
                 dirname(solutionFile),

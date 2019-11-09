@@ -1,5 +1,3 @@
-console.log('environment.ts');
-
 import {GitHub} from '@actions/github';
 import { getInput } from '@actions/core';
 

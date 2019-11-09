@@ -1,5 +1,3 @@
-console.log('main.ts');
-
 import handleDotNet from "./dotnet";
 import { fail } from "./helpers";
 

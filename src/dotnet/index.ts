@@ -1,5 +1,3 @@
-console.log('index.ts');
-
 import { join, dirname } from 'path';
 
 import { exec } from '@actions/exec';
@@ -10,7 +8,7 @@ import SolutionFileParser from './solution-file-parser';
 import xml2js from 'xml2js';
 
 import { getGitHubContext, GitHubContext } from '../environment';
-import { globSearch, fail } from '../helpers';
+import { globSearch, fail, logDebug } from '../helpers';
 import { Project } from './project-file-parser';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
 
@@ -21,21 +19,24 @@ async function run(commandLine: string, args?: string[], options?: ExecOptions) 
 }
 
 async function dotnetBuild(solutionFile: string) {
-    console.log('building', solutionFile);
+    logDebug('building', solutionFile);
+
     await run("dotnet", ["build"], {
         cwd: dirname(solutionFile)
     });
 }
 
 async function dotnetTest(solutionFile: string) {
-    console.log('testing', solutionFile);
+    logDebug('testing', solutionFile);
+
     await run("dotnet", ["test"], {
         cwd: dirname(solutionFile)
     });
 }
 
 async function dotnetPack(project: Project) {
-    console.log('packing', project.csprojFilePath);
+    logDebug('packing', project.csprojFilePath);
+
     await generateNuspecFileForProject(project);
 
     await run("dotnet", [
@@ -71,13 +72,13 @@ async function dotnetNuGetPush(project: Project) {
         </packageSourceCredentials>
         </configuration>`;
 
-        console.log('writing nuget.config', nugetConfigContents);
+    logDebug('writing nuget.config', nugetConfigContents);
 
     writeFileSync(
         join(project.directoryPath, 'nuget.config'),
         nugetConfigContents);
     
-    console.log('publishing package', project.nuspecFilePath);
+    logDebug('publishing package', project.nuspecFilePath);
 
     let version = getProjectVersion(gitHub);
 
@@ -142,7 +143,7 @@ async function generateNuspecFileForProject(project: Project) {
     }
 
     let nuspecPath = join(project.directoryPath, `${project.name}.nuspec`);
-    console.log('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
+    logDebug('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
 
     writeFileSync(
         nuspecPath,
@@ -160,14 +161,14 @@ function getProjectVersion(github: GitHubContext) {
 }
 
 export default async function handleDotNet() {
-    console.log('scanning for solutions');
+    logDebug('scanning for solutions');
 
     var solutionFiles = await globSearch("**/*.sln");
-    console.log('solutions found', solutionFiles);
+    logDebug('solutions found', solutionFiles);
 
     for (let solutionFile of solutionFiles) {
         let projects = await SolutionFileParser.getProjects(solutionFile);
-        console.log('projects detected', solutionFile, projects);
+        logDebug('projects detected', solutionFile, projects);
 
         let testProjects = projects.filter(x => x.isTestProject);
         for(let project of testProjects) {

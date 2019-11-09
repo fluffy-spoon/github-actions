@@ -1,8 +1,7 @@
-console.log('project-file-parser.ts');
-
 import xml2js from 'xml2js';
 import fs from 'fs';
 import { basename, extname, dirname, join } from 'path';
+import { logDebug } from '../helpers';
 
 export type StringBoolean = 'true' | 'false';
 export type TestSdkString = 'Microsoft.NET.Test.Sdk' | string;
@@ -52,10 +51,10 @@ export interface Project {
 export default class ProjectFileParser {
     static async readProject(filePath: string): Promise<Project> {
         let fileContents = fs.readFileSync(filePath);
-        console.log('read project file', filePath, filePath);
+        logDebug('read project file', filePath, filePath);
 
         let xml: ProjectFileXmlNode = await xml2js.parseStringPromise(fileContents);
-        console.log('parsed project file', filePath, JSON.stringify(xml));
+        logDebug('parsed project file', filePath, JSON.stringify(xml));
 
         let knownTestSdkStrings = new Array<TestSdkString>();
         knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');

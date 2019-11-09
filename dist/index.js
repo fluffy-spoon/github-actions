@@ -69,7 +69,7 @@ function withDefaults (request, newDefaults) {
 
 const os = __webpack_require__(87);
 const macosRelease = __webpack_require__(118);
-const winRelease = __webpack_require__(49);
+const winRelease = __webpack_require__(494);
 
 const osName = (platform, release) => {
 	if (!platform && release) {
@@ -118,7 +118,7 @@ module.exports = osName;
 /* 3 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var once = __webpack_require__(969);
+var once = __webpack_require__(49);
 
 var noop = function() {};
 
@@ -1435,11 +1435,11 @@ module.exports = opts => {
 module.exports = authenticationPlugin;
 
 const { Deprecation } = __webpack_require__(692);
-const once = __webpack_require__(969);
+const once = __webpack_require__(49);
 
 const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
 
-const authenticate = __webpack_require__(674);
+const authenticate = __webpack_require__(533);
 const beforeRequest = __webpack_require__(471);
 const requestError = __webpack_require__(349);
 
@@ -2042,51 +2042,48 @@ function factory(plugins) {
 /* 49 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-"use strict";
+var wrappy = __webpack_require__(11)
+module.exports = wrappy(once)
+module.exports.strict = wrappy(onceStrict)
 
-const os = __webpack_require__(87);
-const execa = __webpack_require__(955);
+once.proto = once(function () {
+  Object.defineProperty(Function.prototype, 'once', {
+    value: function () {
+      return once(this)
+    },
+    configurable: true
+  })
 
-// Reference: https://www.gaijin.at/en/lstwinver.php
-const names = new Map([
-	['10.0', '10'],
-	['6.3', '8.1'],
-	['6.2', '8'],
-	['6.1', '7'],
-	['6.0', 'Vista'],
-	['5.2', 'Server 2003'],
-	['5.1', 'XP'],
-	['5.0', '2000'],
-	['4.9', 'ME'],
-	['4.1', '98'],
-	['4.0', '95']
-]);
+  Object.defineProperty(Function.prototype, 'onceStrict', {
+    value: function () {
+      return onceStrict(this)
+    },
+    configurable: true
+  })
+})
 
-const windowsRelease = release => {
-	const version = /\d+\.\d/.exec(release || os.release());
+function once (fn) {
+  var f = function () {
+    if (f.called) return f.value
+    f.called = true
+    return f.value = fn.apply(this, arguments)
+  }
+  f.called = false
+  return f
+}
 
-	if (release && !version) {
-		throw new Error('`release` argument doesn\'t match `n.n`');
-	}
-
-	const ver = (version || [])[0];
-
-	// Server 2008, 2012 and 2016 versions are ambiguous with desktop versions and must be detected at runtime.
-	// If `release` is omitted or we're on a Windows system, and the version number is an ambiguous version
-	// then use `wmic` to get the OS caption: https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
-	// If the resulting caption contains the year 2008, 2012 or 2016, it is a server version, so return a server OS name.
-	if ((!release || release === os.release()) && ['6.1', '6.2', '6.3', '10.0'].includes(ver)) {
-		const stdout = execa.sync('wmic', ['os', 'get', 'Caption']).stdout || '';
-		const year = (stdout.match(/2008|2012|2016/) || [])[0];
-		if (year) {
-			return `Server ${year}`;
-		}
-	}
-
-	return names.get(ver);
-};
-
-module.exports = windowsRelease;
+function onceStrict (fn) {
+  var f = function () {
+    if (f.called)
+      throw new Error(f.onceError)
+    f.called = true
+    return f.value = fn.apply(this, arguments)
+  }
+  var name = fn.name || 'Function wrapped with `once`'
+  f.onceError = name + " shouldn't be called more than once"
+  f.called = false
+  return f
+}
 
 
 /***/ }),
@@ -2207,7 +2204,6 @@ module.exports = require("os");
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('environment.ts');
 const github_1 = __webpack_require__(469);
 const core_1 = __webpack_require__(470);
 var KnownGitHubEnvironmentKey;
@@ -3634,12 +3630,12 @@ var alphasort = common.alphasort
 var alphasorti = common.alphasorti
 var setopts = common.setopts
 var ownProp = common.ownProp
-var inflight = __webpack_require__(634)
+var inflight = __webpack_require__(674)
 var util = __webpack_require__(669)
 var childrenIgnored = common.childrenIgnored
 var isIgnored = common.isIgnored
 
-var once = __webpack_require__(969)
+var once = __webpack_require__(49)
 
 function glob (pattern, options, cb) {
   if (typeof options === 'function') cb = options, options = {}
@@ -5295,7 +5291,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('main.ts');
 const dotnet_1 = __importDefault(__webpack_require__(216));
 const helpers_1 = __webpack_require__(872);
 async function run() {
@@ -5774,7 +5769,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('index.ts');
 const path_1 = __webpack_require__(622);
 const exec_1 = __webpack_require__(986);
 const solution_file_parser_1 = __importDefault(__webpack_require__(493));
@@ -5788,19 +5782,19 @@ async function run(commandLine, args, options) {
         return helpers_1.fail('Process ' + commandLine + ' exited with non-zero exit code: ' + result);
 }
 async function dotnetBuild(solutionFile) {
-    console.log('building', solutionFile);
+    helpers_1.logDebug('building', solutionFile);
     await run("dotnet", ["build"], {
         cwd: path_1.dirname(solutionFile)
     });
 }
 async function dotnetTest(solutionFile) {
-    console.log('testing', solutionFile);
+    helpers_1.logDebug('testing', solutionFile);
     await run("dotnet", ["test"], {
         cwd: path_1.dirname(solutionFile)
     });
 }
 async function dotnetPack(project) {
-    console.log('packing', project.csprojFilePath);
+    helpers_1.logDebug('packing', project.csprojFilePath);
     await generateNuspecFileForProject(project);
     await run("dotnet", [
         "pack",
@@ -5832,9 +5826,9 @@ async function dotnetNuGetPush(project) {
             </CustomFeed>
         </packageSourceCredentials>
         </configuration>`;
-    console.log('writing nuget.config', nugetConfigContents);
+    helpers_1.logDebug('writing nuget.config', nugetConfigContents);
     fs_1.writeFileSync(path_1.join(project.directoryPath, 'nuget.config'), nugetConfigContents);
-    console.log('publishing package', project.nuspecFilePath);
+    helpers_1.logDebug('publishing package', project.nuspecFilePath);
     let version = getProjectVersion(gitHub);
     await run("dotnet", [
         "nuget",
@@ -5887,7 +5881,7 @@ async function generateNuspecFileForProject(project) {
         newNuspecContents = new xml2js_1.default.Builder().buildObject(newNuspecXml);
     }
     let nuspecPath = path_1.join(project.directoryPath, `${project.name}.nuspec`);
-    console.log('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
+    helpers_1.logDebug('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
     fs_1.writeFileSync(nuspecPath, newNuspecContents);
 }
 function getProjectVersion(github) {
@@ -5897,12 +5891,12 @@ function getProjectVersion(github) {
     return version;
 }
 async function handleDotNet() {
-    console.log('scanning for solutions');
+    helpers_1.logDebug('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
-    console.log('solutions found', solutionFiles);
+    helpers_1.logDebug('solutions found', solutionFiles);
     for (let solutionFile of solutionFiles) {
         let projects = await solution_file_parser_1.default.getProjects(solutionFile);
-        console.log('projects detected', solutionFile, projects);
+        helpers_1.logDebug('projects detected', solutionFile, projects);
         let testProjects = projects.filter(x => x.isTestProject);
         for (let project of testProjects) {
             await dotnetBuild(project.csprojFilePath);
@@ -8261,72 +8255,7 @@ function coerce (version) {
 /* 281 */,
 /* 282 */,
 /* 283 */,
-/* 284 */
-/***/ (function(module) {
-
-"use strict";
-
-module.exports = balanced;
-function balanced(a, b, str) {
-  if (a instanceof RegExp) a = maybeMatch(a, str);
-  if (b instanceof RegExp) b = maybeMatch(b, str);
-
-  var r = range(a, b, str);
-
-  return r && {
-    start: r[0],
-    end: r[1],
-    pre: str.slice(0, r[0]),
-    body: str.slice(r[0] + a.length, r[1]),
-    post: str.slice(r[1] + b.length)
-  };
-}
-
-function maybeMatch(reg, str) {
-  var m = str.match(reg);
-  return m ? m[0] : null;
-}
-
-balanced.range = range;
-function range(a, b, str) {
-  var begs, beg, left, right, result;
-  var ai = str.indexOf(a);
-  var bi = str.indexOf(b, ai + 1);
-  var i = ai;
-
-  if (ai >= 0 && bi > 0) {
-    begs = [];
-    left = str.length;
-
-    while (i >= 0 && !result) {
-      if (i == ai) {
-        begs.push(i);
-        ai = str.indexOf(a, i + 1);
-      } else if (begs.length == 1) {
-        result = [ begs.pop(), bi ];
-      } else {
-        beg = begs.pop();
-        if (beg < left) {
-          left = beg;
-          right = bi;
-        }
-
-        bi = str.indexOf(b, i + 1);
-      }
-
-      i = ai < bi && ai >= 0 ? ai : bi;
-    }
-
-    if (begs.length) {
-      result = [ left, right ];
-    }
-  }
-
-  return result;
-}
-
-
-/***/ }),
+/* 284 */,
 /* 285 */,
 /* 286 */,
 /* 287 */,
@@ -8409,7 +8338,7 @@ module.exports = parseOptions;
 
 const { Deprecation } = __webpack_require__(692);
 const { getUserAgent } = __webpack_require__(619);
-const once = __webpack_require__(969);
+const once = __webpack_require__(49);
 
 const pkg = __webpack_require__(215);
 
@@ -8570,7 +8499,7 @@ module.exports = function shimUtilPromisify() {
 module.exports = normalizePaginatedListResponse;
 
 const { Deprecation } = __webpack_require__(692);
-const once = __webpack_require__(969);
+const once = __webpack_require__(49);
 
 const deprecateIncompleteResults = once((log, deprecation) =>
   log.warn(deprecation)
@@ -8769,7 +8698,7 @@ module.exports = require("string_decoder");
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 var concatMap = __webpack_require__(775);
-var balanced = __webpack_require__(284);
+var balanced = __webpack_require__(621);
 
 module.exports = expandTop;
 
@@ -9097,17 +9026,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('project-file-parser.ts');
 const xml2js_1 = __importDefault(__webpack_require__(992));
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __webpack_require__(622);
+const helpers_1 = __webpack_require__(872);
 ;
 class ProjectFileParser {
     static async readProject(filePath) {
         let fileContents = fs_1.default.readFileSync(filePath);
-        console.log('read project file', filePath, filePath);
+        helpers_1.logDebug('read project file', filePath, filePath);
         let xml = await xml2js_1.default.parseStringPromise(fileContents);
-        console.log('parsed project file', filePath, JSON.stringify(xml));
+        helpers_1.logDebug('parsed project file', filePath, JSON.stringify(xml));
         let knownTestSdkStrings = new Array();
         knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');
         let packageReferences = new Array();
@@ -12639,7 +12568,7 @@ module.exports = function (str) {
 /* 453 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-var once = __webpack_require__(969)
+var once = __webpack_require__(49)
 var eos = __webpack_require__(3)
 var fs = __webpack_require__(747) // we only need fs to get the ReadStream and WriteStream prototypes
 
@@ -13592,10 +13521,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('solution-file-parser.ts');
 const fs_1 = __importDefault(__webpack_require__(747));
 const path_1 = __webpack_require__(622);
 const project_file_parser_1 = __importDefault(__webpack_require__(316));
+const helpers_1 = __webpack_require__(872);
 class SolutionFileParser {
     static async getProjects(solutionFile) {
         let guidRegex = `\\{[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\}`;
@@ -13610,7 +13539,7 @@ class SolutionFileParser {
             let match = projectLineRegex.exec(line);
             if (!match || match.length < 3)
                 continue;
-            console.log('detected project from solution file', solutionFile, match);
+            helpers_1.logDebug('detected project from solution file', solutionFile, match);
             let projectFilePath = path_1.join(path_1.dirname(solutionFile), match[2]).replace(/\\/g, path_1.sep);
             projects.push(await project_file_parser_1.default.readProject(projectFilePath));
         }
@@ -13621,7 +13550,57 @@ exports.default = SolutionFileParser;
 
 
 /***/ }),
-/* 494 */,
+/* 494 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+const os = __webpack_require__(87);
+const execa = __webpack_require__(955);
+
+// Reference: https://www.gaijin.at/en/lstwinver.php
+const names = new Map([
+	['10.0', '10'],
+	['6.3', '8.1'],
+	['6.2', '8'],
+	['6.1', '7'],
+	['6.0', 'Vista'],
+	['5.2', 'Server 2003'],
+	['5.1', 'XP'],
+	['5.0', '2000'],
+	['4.9', 'ME'],
+	['4.1', '98'],
+	['4.0', '95']
+]);
+
+const windowsRelease = release => {
+	const version = /\d+\.\d/.exec(release || os.release());
+
+	if (release && !version) {
+		throw new Error('`release` argument doesn\'t match `n.n`');
+	}
+
+	const ver = (version || [])[0];
+
+	// Server 2008, 2012 and 2016 versions are ambiguous with desktop versions and must be detected at runtime.
+	// If `release` is omitted or we're on a Windows system, and the version number is an ambiguous version
+	// then use `wmic` to get the OS caption: https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
+	// If the resulting caption contains the year 2008, 2012 or 2016, it is a server version, so return a server OS name.
+	if ((!release || release === os.release()) && ['6.1', '6.2', '6.3', '10.0'].includes(ver)) {
+		const stdout = execa.sync('wmic', ['os', 'get', 'Caption']).stdout || '';
+		const year = (stdout.match(/2008|2012|2016/) || [])[0];
+		if (year) {
+			return `Server ${year}`;
+		}
+	}
+
+	return names.get(ver);
+};
+
+module.exports = windowsRelease;
+
+
+/***/ }),
 /* 495 */,
 /* 496 */,
 /* 497 */,
@@ -13720,7 +13699,52 @@ function getUserAgentNode () {
 
 /***/ }),
 /* 511 */,
-/* 512 */,
+/* 512 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+"use strict";
+
+const path = __webpack_require__(622);
+const pathKey = __webpack_require__(39);
+
+module.exports = opts => {
+	opts = Object.assign({
+		cwd: process.cwd(),
+		path: process.env[pathKey()]
+	}, opts);
+
+	let prev;
+	let pth = path.resolve(opts.cwd);
+	const ret = [];
+
+	while (prev !== pth) {
+		ret.push(path.join(pth, 'node_modules/.bin'));
+		prev = pth;
+		pth = path.resolve(pth, '..');
+	}
+
+	// ensure the running `node` binary is used
+	ret.push(path.dirname(process.execPath));
+
+	return ret.concat(opts.path).join(path.delimiter);
+};
+
+module.exports.env = opts => {
+	opts = Object.assign({
+		env: process.env
+	}, opts);
+
+	const env = Object.assign({}, opts.env);
+	const path = pathKey({env});
+
+	opts.path = env[path];
+	env[path] = module.exports(opts);
+
+	return env;
+};
+
+
+/***/ }),
 /* 513 */,
 /* 514 */,
 /* 515 */
@@ -13917,7 +13941,64 @@ module.exports = factory();
 /* 530 */,
 /* 531 */,
 /* 532 */,
-/* 533 */,
+/* 533 */
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+module.exports = authenticate;
+
+const { Deprecation } = __webpack_require__(692);
+const once = __webpack_require__(49);
+
+const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
+
+function authenticate(state, options) {
+  deprecateAuthenticate(
+    state.octokit.log,
+    new Deprecation(
+      '[@octokit/rest] octokit.authenticate() is deprecated. Use "auth" constructor option instead.'
+    )
+  );
+
+  if (!options) {
+    state.auth = false;
+    return;
+  }
+
+  switch (options.type) {
+    case "basic":
+      if (!options.username || !options.password) {
+        throw new Error(
+          "Basic authentication requires both a username and password to be set"
+        );
+      }
+      break;
+
+    case "oauth":
+      if (!options.token && !(options.key && options.secret)) {
+        throw new Error(
+          "OAuth2 authentication requires a token or key & secret to be set"
+        );
+      }
+      break;
+
+    case "token":
+    case "app":
+      if (!options.token) {
+        throw new Error("Token authentication requires a token to be set");
+      }
+      break;
+
+    default:
+      throw new Error(
+        "Invalid authentication type, must be 'basic', 'oauth', 'token' or 'app'"
+      );
+  }
+
+  state.auth = options;
+}
+
+
+/***/ }),
 /* 534 */,
 /* 535 */,
 /* 536 */
@@ -15132,48 +15213,68 @@ exports.getUserAgent = getUserAgent;
 /***/ }),
 /* 620 */,
 /* 621 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
+/***/ (function(module) {
 
 "use strict";
 
-const path = __webpack_require__(622);
-const pathKey = __webpack_require__(39);
+module.exports = balanced;
+function balanced(a, b, str) {
+  if (a instanceof RegExp) a = maybeMatch(a, str);
+  if (b instanceof RegExp) b = maybeMatch(b, str);
 
-module.exports = opts => {
-	opts = Object.assign({
-		cwd: process.cwd(),
-		path: process.env[pathKey()]
-	}, opts);
+  var r = range(a, b, str);
 
-	let prev;
-	let pth = path.resolve(opts.cwd);
-	const ret = [];
+  return r && {
+    start: r[0],
+    end: r[1],
+    pre: str.slice(0, r[0]),
+    body: str.slice(r[0] + a.length, r[1]),
+    post: str.slice(r[1] + b.length)
+  };
+}
 
-	while (prev !== pth) {
-		ret.push(path.join(pth, 'node_modules/.bin'));
-		prev = pth;
-		pth = path.resolve(pth, '..');
-	}
+function maybeMatch(reg, str) {
+  var m = str.match(reg);
+  return m ? m[0] : null;
+}
 
-	// ensure the running `node` binary is used
-	ret.push(path.dirname(process.execPath));
+balanced.range = range;
+function range(a, b, str) {
+  var begs, beg, left, right, result;
+  var ai = str.indexOf(a);
+  var bi = str.indexOf(b, ai + 1);
+  var i = ai;
 
-	return ret.concat(opts.path).join(path.delimiter);
-};
+  if (ai >= 0 && bi > 0) {
+    begs = [];
+    left = str.length;
 
-module.exports.env = opts => {
-	opts = Object.assign({
-		env: process.env
-	}, opts);
+    while (i >= 0 && !result) {
+      if (i == ai) {
+        begs.push(i);
+        ai = str.indexOf(a, i + 1);
+      } else if (begs.length == 1) {
+        result = [ begs.pop(), bi ];
+      } else {
+        beg = begs.pop();
+        if (beg < left) {
+          left = beg;
+          right = bi;
+        }
 
-	const env = Object.assign({}, opts.env);
-	const path = pathKey({env});
+        bi = str.indexOf(b, i + 1);
+      }
 
-	opts.path = env[path];
-	env[path] = module.exports(opts);
+      i = ai < bi && ai >= 0 ? ai : bi;
+    }
 
-	return env;
-};
+    if (begs.length) {
+      result = [ left, right ];
+    }
+  }
+
+  return result;
+}
 
 
 /***/ }),
@@ -15194,66 +15295,7 @@ module.exports = require("path");
 /* 631 */,
 /* 632 */,
 /* 633 */,
-/* 634 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var wrappy = __webpack_require__(11)
-var reqs = Object.create(null)
-var once = __webpack_require__(969)
-
-module.exports = wrappy(inflight)
-
-function inflight (key, cb) {
-  if (reqs[key]) {
-    reqs[key].push(cb)
-    return null
-  } else {
-    reqs[key] = [cb]
-    return makeres(key)
-  }
-}
-
-function makeres (key) {
-  return once(function RES () {
-    var cbs = reqs[key]
-    var len = cbs.length
-    var args = slice(arguments)
-
-    // XXX It's somewhat ambiguous whether a new callback added in this
-    // pass should be queued for later execution if something in the
-    // list of callbacks throws, or if it should just be discarded.
-    // However, it's such an edge case that it hardly matters, and either
-    // choice is likely as surprising as the other.
-    // As it happens, we do go ahead and schedule it for later execution.
-    try {
-      for (var i = 0; i < len; i++) {
-        cbs[i].apply(null, args)
-      }
-    } finally {
-      if (cbs.length > len) {
-        // added more in the interim.
-        // de-zalgo, just in case, but don't call again.
-        cbs.splice(0, len)
-        process.nextTick(function () {
-          RES.apply(null, args)
-        })
-      } else {
-        delete reqs[key]
-      }
-    }
-  })
-}
-
-function slice (args) {
-  var length = args.length
-  var array = []
-
-  for (var i = 0; i < length; i++) array[i] = args[i]
-  return array
-}
-
-
-/***/ }),
+/* 634 */,
 /* 635 */,
 /* 636 */,
 /* 637 */,
@@ -17260,57 +17302,59 @@ module.exports = require("util");
 /* 674 */
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-module.exports = authenticate;
+var wrappy = __webpack_require__(11)
+var reqs = Object.create(null)
+var once = __webpack_require__(49)
 
-const { Deprecation } = __webpack_require__(692);
-const once = __webpack_require__(969);
+module.exports = wrappy(inflight)
 
-const deprecateAuthenticate = once((log, deprecation) => log.warn(deprecation));
-
-function authenticate(state, options) {
-  deprecateAuthenticate(
-    state.octokit.log,
-    new Deprecation(
-      '[@octokit/rest] octokit.authenticate() is deprecated. Use "auth" constructor option instead.'
-    )
-  );
-
-  if (!options) {
-    state.auth = false;
-    return;
+function inflight (key, cb) {
+  if (reqs[key]) {
+    reqs[key].push(cb)
+    return null
+  } else {
+    reqs[key] = [cb]
+    return makeres(key)
   }
+}
 
-  switch (options.type) {
-    case "basic":
-      if (!options.username || !options.password) {
-        throw new Error(
-          "Basic authentication requires both a username and password to be set"
-        );
+function makeres (key) {
+  return once(function RES () {
+    var cbs = reqs[key]
+    var len = cbs.length
+    var args = slice(arguments)
+
+    // XXX It's somewhat ambiguous whether a new callback added in this
+    // pass should be queued for later execution if something in the
+    // list of callbacks throws, or if it should just be discarded.
+    // However, it's such an edge case that it hardly matters, and either
+    // choice is likely as surprising as the other.
+    // As it happens, we do go ahead and schedule it for later execution.
+    try {
+      for (var i = 0; i < len; i++) {
+        cbs[i].apply(null, args)
       }
-      break;
-
-    case "oauth":
-      if (!options.token && !(options.key && options.secret)) {
-        throw new Error(
-          "OAuth2 authentication requires a token or key & secret to be set"
-        );
+    } finally {
+      if (cbs.length > len) {
+        // added more in the interim.
+        // de-zalgo, just in case, but don't call again.
+        cbs.splice(0, len)
+        process.nextTick(function () {
+          RES.apply(null, args)
+        })
+      } else {
+        delete reqs[key]
       }
-      break;
+    }
+  })
+}
 
-    case "token":
-    case "app":
-      if (!options.token) {
-        throw new Error("Token authentication requires a token to be set");
-      }
-      break;
+function slice (args) {
+  var length = args.length
+  var array = []
 
-    default:
-      throw new Error(
-        "Invalid authentication type, must be 'basic', 'oauth', 'token' or 'app'"
-      );
-  }
-
-  state.auth = options;
+  for (var i = 0; i < length; i++) array[i] = args[i]
+  return array
 }
 
 
@@ -22594,7 +22638,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var deprecation = __webpack_require__(692);
-var once = _interopDefault(__webpack_require__(969));
+var once = _interopDefault(__webpack_require__(49));
 
 const logOnce = once(deprecation => console.warn(deprecation));
 /**
@@ -24006,7 +24050,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-console.log('helpers.ts');
 const glob_1 = __importDefault(__webpack_require__(120));
 const fs_1 = __importDefault(__webpack_require__(747));
 const http_1 = __importDefault(__webpack_require__(605));
@@ -24014,14 +24057,14 @@ const path_1 = __webpack_require__(622);
 const environment_1 = __webpack_require__(89);
 const core_1 = __webpack_require__(470);
 async function globSearch(pattern) {
-    console.log('begin-glob', pattern);
+    logDebug('begin-glob', pattern);
     let context = await environment_1.getGitHubContext();
     return new Promise((resolve, reject) => glob_1.default(path_1.join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
         if (err) {
-            console.log('err-glob', pattern, err);
+            logDebug('err-glob', pattern, err);
             return reject(err);
         }
-        console.log('end-glob', pattern, files);
+        logDebug('end-glob', pattern, files);
         return resolve(files);
     }));
 }
@@ -24047,6 +24090,10 @@ function fail(obj) {
     core_1.setFailed(obj.message || obj);
 }
 exports.fail = fail;
+function logDebug(...params) {
+    core_1.debug(JSON.stringify(params));
+}
+exports.logDebug = logDebug;
 
 
 /***/ }),
@@ -26046,7 +26093,7 @@ const path = __webpack_require__(622);
 const childProcess = __webpack_require__(129);
 const crossSpawn = __webpack_require__(20);
 const stripEof = __webpack_require__(303);
-const npmRunPath = __webpack_require__(621);
+const npmRunPath = __webpack_require__(512);
 const isStream = __webpack_require__(323);
 const _getStream = __webpack_require__(145);
 const pFinally = __webpack_require__(697);
@@ -26528,54 +26575,7 @@ module.exports = options => {
 /***/ }),
 /* 967 */,
 /* 968 */,
-/* 969 */
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-var wrappy = __webpack_require__(11)
-module.exports = wrappy(once)
-module.exports.strict = wrappy(onceStrict)
-
-once.proto = once(function () {
-  Object.defineProperty(Function.prototype, 'once', {
-    value: function () {
-      return once(this)
-    },
-    configurable: true
-  })
-
-  Object.defineProperty(Function.prototype, 'onceStrict', {
-    value: function () {
-      return onceStrict(this)
-    },
-    configurable: true
-  })
-})
-
-function once (fn) {
-  var f = function () {
-    if (f.called) return f.value
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  f.called = false
-  return f
-}
-
-function onceStrict (fn) {
-  var f = function () {
-    if (f.called)
-      throw new Error(f.onceError)
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  var name = fn.name || 'Function wrapped with `once`'
-  f.onceError = name + " shouldn't be called more than once"
-  f.called = false
-  return f
-}
-
-
-/***/ }),
+/* 969 */,
 /* 970 */,
 /* 971 */,
 /* 972 */,
