@@ -1,5 +1,5 @@
 import {GitHub} from '@actions/github';
-import core from '@actions/core';
+import { getInput } from '@actions/core';
 import { ReposGetResponse, UsersGetByUsernameResponse, ReposListCommitsResponseItem, ReposGetLatestReleaseResponse } from '@octokit/rest';
 
 enum KnownGitHubEnvironmentKey {
@@ -36,11 +36,11 @@ export async function getGitHubContext(): Promise<GitHubContext> {
         return cachedContextPromise;
 
     cachedContextPromise = new Promise<GitHubContext>(async () => {
-        const token = core.getInput('gitHubKey');
+        const token = getInput('gitHubKey');
 
         let environment: KnownGitHubEnvironmentKeyObject = {} as any;
         for(let key in KnownGitHubEnvironmentKey)
-            environment[key] = core.getInput('GITHUB_' + key);
+            environment[key] = getInput('GITHUB_' + key);
 
         let [owner, repo] = environment.REPOSITORY.split('/');
 

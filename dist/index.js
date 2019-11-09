@@ -2206,12 +2206,9 @@ module.exports = require("os");
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const github_1 = __webpack_require__(469);
-const core_1 = __importDefault(__webpack_require__(470));
+const core_1 = __webpack_require__(470);
 var KnownGitHubEnvironmentKey;
 (function (KnownGitHubEnvironmentKey) {
     KnownGitHubEnvironmentKey[KnownGitHubEnvironmentKey["WORKFLOW"] = 0] = "WORKFLOW";
@@ -2232,10 +2229,10 @@ async function getGitHubContext() {
     if (cachedContextPromise)
         return cachedContextPromise;
     cachedContextPromise = new Promise(async () => {
-        const token = core_1.default.getInput('gitHubKey');
+        const token = core_1.getInput('gitHubKey');
         let environment = {};
         for (let key in KnownGitHubEnvironmentKey)
-            environment[key] = core_1.default.getInput('GITHUB_' + key);
+            environment[key] = core_1.getInput('GITHUB_' + key);
         let [owner, repo] = environment.REPOSITORY.split('/');
         let client = new github_1.GitHub(token);
         let userResponse = await client.users.getByUsername({
