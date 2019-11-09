@@ -1,11 +1,11 @@
 import xml2js from 'xml2js';
 import fs from 'fs';
 
-export type StringBoolean = 'true'|'false';
-export type TestSdkString = 'Microsoft.NET.Test.Sdk'|string;
-export type SdkString = 
-    'Microsoft.NET.Sdk'|
-    TestSdkString|
+export type StringBoolean = 'true' | 'false';
+export type TestSdkString = 'Microsoft.NET.Test.Sdk' | string;
+export type SdkString =
+    'Microsoft.NET.Sdk' |
+    TestSdkString |
     string;
 
 export interface ProjectFileXmlNode {
@@ -20,7 +20,7 @@ export interface ProjectFileXmlNode {
         ItemGroup: Array<{
             PackageReference: Array<{
                 $: {
-                    Include: SdkString|string,
+                    Include: SdkString | string,
                     Version: string
                 }
             }>
@@ -29,7 +29,7 @@ export interface ProjectFileXmlNode {
 }
 
 export interface PackageReference {
-    name: SdkString|string;
+    name: SdkString | string;
     version: string;
 }
 
@@ -51,12 +51,21 @@ export default class ProjectFileParser {
         knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');
 
         let packageReferences = new Array<PackageReference>();
-        for(let itemGroupElement of xml.Project.ItemGroup)
-        for(let packageReferenceElement of itemGroupElement.PackageReference) {
-            packageReferences.push({
-                name: packageReferenceElement.$.Include,
-                version: packageReferenceElement.$.Version
-            });
+
+        if(xml.Project.ItemGroup) {
+
+            for (let itemGroupElement of xml.Project.ItemGroup) {
+                if(!itemGroupElement.PackageReference)
+                    continue;
+
+                for (let packageReferenceElement of itemGroupElement.PackageReference) {
+                    packageReferences.push({
+                        name: packageReferenceElement.$.Include,
+                        version: packageReferenceElement.$.Version
+                    });
+                }
+            }
+
         }
 
         let isTestProject = packageReferences.findIndex(

@@ -4289,13 +4289,18 @@ class ProjectFileParser {
         let knownTestSdkStrings = new Array();
         knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');
         let packageReferences = new Array();
-        for (let itemGroupElement of xml.Project.ItemGroup)
-            for (let packageReferenceElement of itemGroupElement.PackageReference) {
-                packageReferences.push({
-                    name: packageReferenceElement.$.Include,
-                    version: packageReferenceElement.$.Version
-                });
+        if (xml.Project.ItemGroup) {
+            for (let itemGroupElement of xml.Project.ItemGroup) {
+                if (!itemGroupElement.PackageReference)
+                    continue;
+                for (let packageReferenceElement of itemGroupElement.PackageReference) {
+                    packageReferences.push({
+                        name: packageReferenceElement.$.Include,
+                        version: packageReferenceElement.$.Version
+                    });
+                }
             }
+        }
         let isTestProject = packageReferences.findIndex(p => knownTestSdkStrings.indexOf(p.name) > -1) > -1;
         return {
             xmlNode: xml,
