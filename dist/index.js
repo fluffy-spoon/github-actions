@@ -2229,7 +2229,6 @@ let cachedContextPromise;
 async function getGitHubContext() {
     if (cachedContextPromise)
         return await cachedContextPromise;
-    console.log('fetching context');
     cachedContextPromise = new Promise(async (resolve) => {
         const token = core_1.getInput('gitHubToken');
         let environment = {};
@@ -2242,7 +2241,6 @@ async function getGitHubContext() {
             environment[key] = value;
         }
         let [owner, repo] = environment.REPOSITORY.split('/');
-        console.log('initializing context', environment, token.length);
         let client = new github_1.GitHub(token);
         let userResponse = await client.users.getByUsername({
             username: owner
@@ -2261,9 +2259,9 @@ async function getGitHubContext() {
             owner: userResponse.data,
             latestRelease: latestReleaseResponse && latestReleaseResponse.data,
             environment,
-            token
+            token,
+            shouldPublish: !!token
         };
-        console.log('context initialized', context);
         resolve(context);
     });
     return await cachedContextPromise;

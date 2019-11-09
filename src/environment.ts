@@ -2,7 +2,8 @@ console.log('environment.ts');
 
 import {GitHub} from '@actions/github';
 import { getInput } from '@actions/core';
-import { ReposGetResponse, UsersGetByUsernameResponse, ReposListCommitsResponseItem, ReposGetLatestReleaseResponse } from '@octokit/rest';
+
+import { ReposGetResponse, UsersGetByUsernameResponse, ReposGetLatestReleaseResponse } from '@octokit/rest';
 
 enum KnownGitHubEnvironmentKey {
     WORKFLOW,
@@ -28,7 +29,8 @@ export type GitHubContext = {
     repository: ReposGetResponse,
     owner: UsersGetByUsernameResponse,
     latestRelease: ReposGetLatestReleaseResponse | null,
-    token: string
+    token: string,
+    shouldPublish: boolean
 };
 
 let cachedContextPromise: Promise<GitHubContext>;
@@ -36,8 +38,6 @@ let cachedContextPromise: Promise<GitHubContext>;
 export async function getGitHubContext(): Promise<GitHubContext> {
     if(cachedContextPromise)
         return await cachedContextPromise;
-
-    console.log('fetching context');
 
     cachedContextPromise = new Promise<GitHubContext>(async (resolve) => {
         const token = getInput('gitHubToken');
@@ -55,8 +55,6 @@ export async function getGitHubContext(): Promise<GitHubContext> {
         }
 
         let [owner, repo] = environment.REPOSITORY.split('/');
-
-        console.log('initializing context', environment, token.length);
 
         let client = new GitHub(token);
 
@@ -80,10 +78,9 @@ export async function getGitHubContext(): Promise<GitHubContext> {
             owner: userResponse.data,
             latestRelease: latestReleaseResponse && latestReleaseResponse.data,
             environment,
-            token
+            token,
+            shouldPublish: !!token
         };
-
-        console.log('context initialized', context);
 
         resolve(context);
     });
