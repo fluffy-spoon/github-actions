@@ -2228,9 +2228,9 @@ var KnownGitHubEnvironmentKey;
 let cachedContextPromise;
 async function getGitHubContext() {
     if (cachedContextPromise)
-        return cachedContextPromise;
+        return await cachedContextPromise;
     console.log('fetching context');
-    cachedContextPromise = new Promise(async () => {
+    cachedContextPromise = new Promise(async (resolve) => {
         const token = core_1.getInput('gitHubToken');
         let environment = {};
         for (let key in KnownGitHubEnvironmentKey) {
@@ -2264,7 +2264,7 @@ async function getGitHubContext() {
             token
         };
         console.log('context initialized', context);
-        return context;
+        resolve(context);
     });
     return await cachedContextPromise;
 }

@@ -35,11 +35,11 @@ let cachedContextPromise: Promise<GitHubContext>;
 
 export async function getGitHubContext(): Promise<GitHubContext> {
     if(cachedContextPromise)
-        return cachedContextPromise;
+        return await cachedContextPromise;
 
     console.log('fetching context');
 
-    cachedContextPromise = new Promise<GitHubContext>(async () => {
+    cachedContextPromise = new Promise<GitHubContext>(async (resolve) => {
         const token = getInput('gitHubToken');
 
         let environment: KnownGitHubEnvironmentKeyObject = {} as any;
@@ -85,7 +85,7 @@ export async function getGitHubContext(): Promise<GitHubContext> {
 
         console.log('context initialized', context);
 
-        return context;
+        resolve(context);
     });
 
     return await cachedContextPromise;
