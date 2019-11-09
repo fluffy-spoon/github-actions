@@ -574,7 +574,7 @@ const helpers_1 = __webpack_require__(872);
 const package_json_parser_1 = __importDefault(__webpack_require__(140));
 async function npmCommand(project, command) {
     helpers_1.logDebug('running command', command, project);
-    await helpers_1.runProcess("npm", [command], {
+    await helpers_1.runProcess("npm", ["run", command], {
         cwd: project.directoryPath
     });
 }

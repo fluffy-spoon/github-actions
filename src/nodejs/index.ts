@@ -4,7 +4,7 @@ import PackageJsonParser, { NodeJsPackage } from "./package-json-parser";
 async function npmCommand(project: NodeJsPackage, command: string) {
     logDebug('running command', command, project);
 
-    await runProcess("npm", [command], {
+    await runProcess("npm", ["run", command], {
         cwd: project.directoryPath
     });
 }
