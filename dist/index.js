@@ -4282,11 +4282,26 @@ const xml2js_1 = __importDefault(__webpack_require__(992));
 const fs_1 = __importDefault(__webpack_require__(747));
 class ProjectFileParser {
     static async readProject(filePath) {
-        var fileContents = fs_1.default.readFileSync(filePath);
+        let fileContents = fs_1.default.readFileSync(filePath);
         console.log('read project file', filePath, filePath);
-        var xml = await xml2js_1.default.parseStringPromise(fileContents);
+        let xml = await xml2js_1.default.parseStringPromise(fileContents);
         console.log('parsed project file', filePath, JSON.stringify(xml));
-        return {};
+        let knownTestSdkStrings = new Array();
+        knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');
+        let packageReferences = new Array();
+        for (let itemGroupElement of xml.Project.ItemGroup)
+            for (let packageReferenceElement of itemGroupElement.PackageReference) {
+                packageReferences.push({
+                    name: packageReferenceElement.$.Include,
+                    version: packageReferenceElement.$.Version
+                });
+            }
+        let isTestProject = packageReferences.findIndex(p => knownTestSdkStrings.indexOf(p.name) > -1) > -1;
+        return {
+            xmlNode: xml,
+            isTestProject,
+            packageReferences
+        };
     }
 }
 exports.default = ProjectFileParser;
