@@ -166,7 +166,7 @@ export default async function handleDotNet() {
     logDebug('installing dotnet');
 
     let dotnetInstaller = await import('./setup-dotnet/src/installer');
-    await new dotnetInstaller.DotnetCoreInstaller(void 0).installDotnet();
+    await new dotnetInstaller.DotnetCoreInstaller('').installDotnet();
 
     logDebug('scanning for solutions');
 

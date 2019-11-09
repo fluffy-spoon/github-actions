@@ -5459,11 +5459,6 @@ async function gitCommand(args) {
 async function gitCheckout() {
     let github = await environment_1.getGitHubContext();
     await gitCommand(['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
-    // await gitCommand(['init', github.environment.WORKSPACE]);
-    // await gitCommand(['remote', 'add', 'origin', github.repository.html_url]);
-    // await gitCommand(['config', 'gc.auto', '0']);
-    // await gitCommand(['-c', 'http.extraheader="AUTHORIZATION: basic ' + github.token + '"', 'fetch', '--tags', '--prune', '--progress', '--no-recurse-submodules', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
-    // await gitCommand(['checkout', '--progress', '--force', github.environment.SHA]);
 }
 async function run() {
     await gitCheckout();
@@ -5738,7 +5733,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip";
+        const unzipPath = __webpack_require__.ab + "unzip1";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
@@ -6800,7 +6795,7 @@ async function getProjectVersion(project) {
 async function handleDotNet() {
     helpers_1.logDebug('installing dotnet');
     let dotnetInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
-    await new dotnetInstaller.DotnetCoreInstaller(void 0).installDotnet();
+    await new dotnetInstaller.DotnetCoreInstaller('').installDotnet();
     helpers_1.logDebug('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
     helpers_1.logDebug('solutions found', solutionFiles);
@@ -19843,7 +19838,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip1";
+        const unzipPath = __webpack_require__.ab + "unzip";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
