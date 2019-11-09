@@ -5452,7 +5452,7 @@ const nodejs_1 = __importDefault(__webpack_require__(25));
 const environment_1 = __webpack_require__(89);
 async function gitCommand(args) {
     let github = await environment_1.getGitHubContext();
-    return await helpers_1.runProcess('git', args, {
+    return await helpers_1.runProcess('/usr/bin/git', args, {
         cwd: github.environment.WORKSPACE
     });
 }

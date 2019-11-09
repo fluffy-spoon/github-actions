@@ -6,7 +6,7 @@ import { ExecOptions } from "@actions/exec/lib/interfaces";
 
 async function gitCommand(args: string[]) {
     let github = await getGitHubContext();
-    return await runProcess('git', args, {
+    return await runProcess('/usr/bin/git', args, {
         cwd: github.environment.WORKSPACE
     });
 }
