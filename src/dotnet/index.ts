@@ -200,6 +200,8 @@ export default async function handleDotNet() {
 }
 
 async function installDotNet() {
+    logDebug('installing dotnet', __dirname);
+
     await copy(
         join(__dirname, '..', 'src', 'dotnet', 'setup-dotnet', 'externals'),
         join(__dirname, '..', 'externals'));

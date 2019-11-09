@@ -7184,6 +7184,7 @@ async function handleDotNet() {
 }
 exports.default = handleDotNet;
 async function installDotNet() {
+    helpers_1.logDebug('installing dotnet', __dirname);
     await fs_extra_1.copy(path_1.join(__dirname, '..', 'src', 'dotnet', 'setup-dotnet', 'externals'), path_1.join(__dirname, '..', 'externals'));
     let dotnetInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
     await new dotnetInstaller.DotnetCoreInstaller('3.0.100').installDotnet();
