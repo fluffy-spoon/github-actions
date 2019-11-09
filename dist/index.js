@@ -9132,7 +9132,10 @@ class ProjectFileParser {
         let isTestProject = packageReferences.findIndex(p => knownTestSdkStrings.indexOf(p.name) > -1) > -1;
         let directoryPath = path_1.dirname(filePath);
         let name = path_1.basename(filePath, path_1.extname(filePath));
-        let nuspecFilePath = properties.map(p => p.NuspecFile).find(p => !!p) ||
+        let nuspecFilePath = properties
+            .map(p => p.NuspecFile)
+            .filter(p => !!p)
+            .map(p => path_1.join(directoryPath, p))[0] ||
             path_1.join(directoryPath, `${name}.nuspec`);
         return {
             xmlNode: xml,

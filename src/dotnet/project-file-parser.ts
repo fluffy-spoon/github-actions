@@ -93,7 +93,10 @@ export default class ProjectFileParser {
         let name = basename(filePath, extname(filePath));
 
         let nuspecFilePath = 
-            properties.map(p => p.NuspecFile).find(p => !!p) ||
+            properties
+                .map(p => p.NuspecFile)
+                .filter(p => !!p)
+                .map(p => join(directoryPath, p as string))[0] ||
             join(directoryPath, `${name}.nuspec`);
 
         return {
