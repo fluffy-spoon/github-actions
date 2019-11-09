@@ -7,6 +7,7 @@ import { getGitHubContext } from '../environment';
 import { globSearch, logDebug, runProcess } from '../helpers';
 import { Project } from './project-file-parser';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { error } from '@actions/core';
 
 async function dotnetBuild(solutionFile: string) {
     logDebug('building', solutionFile);
@@ -186,7 +187,12 @@ export default async function handleDotNet() {
             await dotnetPack(project);
         }
 
-        for(let project of nonTestProjects)
-            await dotnetNuGetPush(project);
+        for(let project of nonTestProjects) {
+            try {
+                await dotnetNuGetPush(project);
+            } catch(ex) {
+                error(ex.message);
+            }
+        }
     }
 }

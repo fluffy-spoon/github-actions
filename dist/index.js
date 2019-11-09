@@ -5272,6 +5272,7 @@ const xml2js_1 = __importDefault(__webpack_require__(992));
 const environment_1 = __webpack_require__(89);
 const helpers_1 = __webpack_require__(872);
 const fs_1 = __webpack_require__(747);
+const core_1 = __webpack_require__(393);
 async function dotnetBuild(solutionFile) {
     helpers_1.logDebug('building', solutionFile);
     await helpers_1.runProcess("dotnet", ["build"], {
@@ -5408,8 +5409,14 @@ async function handleDotNet() {
             await dotnetBuild(project.csprojFilePath);
             await dotnetPack(project);
         }
-        for (let project of nonTestProjects)
-            await dotnetNuGetPush(project);
+        for (let project of nonTestProjects) {
+            try {
+                await dotnetNuGetPush(project);
+            }
+            catch (ex) {
+                core_1.error(ex.message);
+            }
+        }
     }
 }
 exports.default = handleDotNet;
