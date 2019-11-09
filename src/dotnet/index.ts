@@ -99,7 +99,8 @@ async function generateNuspecFileForProject(project: Project) {
     let github = await getGitHubContext();
 
     let topics = github.repository.topics;
-    let newNuspecContents = `<?xml version="1.0"?>
+    let nuspecRootXml = `<?xml version="1.0"?>`;
+    let newNuspecContents = `${nuspecRootXml}
         <package>
             <metadata>
                 <id>${project.name}</id>
@@ -139,8 +140,8 @@ async function generateNuspecFileForProject(project: Project) {
             ... existingNuspecXml.package.metadata[0]
         };
 
-        newNuspecContents = new xml2js.Builder().buildObject(newNuspecXml);
-        writeFileSync(project.nuspecFilePath, newNuspecContents);
+        newNuspecContents = new xml2js.Builder({headless: true}).buildObject(newNuspecXml);
+        writeFileSync(project.nuspecFilePath, `${nuspecRootXml}${newNuspecContents}`);
     }
 
     let nuspecPath = join(project.directoryPath, `${project.name}.nuspec`);
