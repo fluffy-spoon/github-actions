@@ -5865,7 +5865,7 @@ async function generateNuspecFileForProject(project) {
                 <description>${github.repository.description}</description>
                 <releaseNotes>No release notes available.</releaseNotes>
                 <copyright>Copyright ${new Date().getFullYear()}</copyright>
-                <tags>${github.repository.topics.join(', ')}</tags>
+                <tags>${github.repository.topics && github.repository.topics.join(', ')}</tags>
                 <dependencies>
                     ${project.packageReferences
         .map(x => `<dependency id="${x.name}" version="${x.version}" />`)
