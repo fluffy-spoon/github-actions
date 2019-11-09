@@ -9133,7 +9133,7 @@ class ProjectFileParser {
         let directoryPath = path_1.dirname(filePath);
         let name = path_1.basename(filePath, path_1.extname(filePath));
         let nuspecFilePath = properties
-            .map(p => p.NuspecFile)
+            .map(p => p.NuspecFile && p.NuspecFile[0])
             .filter(p => !!p)
             .map(p => path_1.join(directoryPath, p))[0] ||
             path_1.join(directoryPath, `${name}.nuspec`);

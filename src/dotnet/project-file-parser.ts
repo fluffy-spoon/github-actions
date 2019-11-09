@@ -14,7 +14,7 @@ export type SdkString =
 export interface PropertyGroupXmlNode {
     TargetFramework?: ['netstandard2.0'],
     IsPackable?: [StringBoolean],
-    NuspecFile?: string
+    NuspecFile?: [string]
 };
 
 export interface ProjectFileXmlNode {
@@ -94,9 +94,11 @@ export default class ProjectFileParser {
 
         let nuspecFilePath = 
             properties
-                .map(p => p.NuspecFile)
+                .map(p => p.NuspecFile && p.NuspecFile[0])
                 .filter(p => !!p)
-                .map(p => join(directoryPath, p as string))[0] ||
+                .map(p => join(
+                    directoryPath, 
+                    p as string))[0] ||
             join(directoryPath, `${name}.nuspec`);
 
         return {
