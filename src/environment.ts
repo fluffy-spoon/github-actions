@@ -25,7 +25,7 @@ export type GitHubContext = {
     environment: KnownGitHubEnvironmentKeyObject,
     repository: ReposGetResponse,
     owner: UsersGetByUsernameResponse,
-    latestRelease: ReposGetLatestReleaseResponse,
+    latestRelease: ReposGetLatestReleaseResponse | null,
     token: string
 };
 
@@ -72,14 +72,18 @@ export async function getGitHubContext(): Promise<GitHubContext> {
             repo
         }).catch(() => null);
 
-        return {
+        let context: GitHubContext = {
             client,
             repository: repositoryResponse.data,
             owner: userResponse.data,
             latestRelease: latestReleaseResponse && latestReleaseResponse.data,
             environment,
             token
-        } as GitHubContext;
+        };
+
+        console.log('context initialized', context);
+
+        return context;
     });
 
     return cachedContextPromise;

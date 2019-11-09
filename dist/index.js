@@ -2254,7 +2254,7 @@ async function getGitHubContext() {
             owner,
             repo
         }).catch(() => null);
-        return {
+        let context = {
             client,
             repository: repositoryResponse.data,
             owner: userResponse.data,
@@ -2262,6 +2262,8 @@ async function getGitHubContext() {
             environment,
             token
         };
+        console.log('context initialized', context);
+        return context;
     });
     return cachedContextPromise;
 }
