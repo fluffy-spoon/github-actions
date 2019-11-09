@@ -1,10 +1,10 @@
 import { logDebug, globSearch, runProcess } from "../helpers";
 import PackageJsonParser, { NodeJsPackage } from "./package-json-parser";
 
-async function npmCommand(project: NodeJsPackage, command: string) {
-    logDebug('running command', command, project);
+async function npmCommand(project: NodeJsPackage, ...commandArgs: string[]) {
+    logDebug('running command', commandArgs, project);
 
-    await runProcess("npm", ["run", command], {
+    await runProcess("npm", commandArgs, {
         cwd: project.directoryPath
     });
 }
@@ -37,10 +37,10 @@ export default async function handleNodeJs() {
         await npmCommand(project, 'install');
 
         if(project.hasBuildCommand)
-            await npmCommand(project, 'build');
+            await npmCommand(project, 'run', 'build');
 
         if(project.hasTestCommand)
-            await npmCommand(project, 'test');
+            await npmCommand(project, 'run', 'test');
 
         await npmPublish(project);
     }
