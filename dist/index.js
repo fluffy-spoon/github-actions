@@ -2228,12 +2228,14 @@ let cachedContextPromise;
 async function getGitHubContext() {
     if (cachedContextPromise)
         return cachedContextPromise;
+    console.log('fetching context');
     cachedContextPromise = new Promise(async () => {
         const token = core_1.getInput('gitHubKey');
         let environment = {};
         for (let key in KnownGitHubEnvironmentKey)
             environment[key] = core_1.getInput('GITHUB_' + key);
         let [owner, repo] = environment.REPOSITORY.split('/');
+        console.log('initializing context', environment, token.length);
         let client = new github_1.GitHub(token);
         let userResponse = await client.users.getByUsername({
             username: owner
@@ -5287,10 +5289,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotnet_1 = __importDefault(__webpack_require__(216));
+const helpers_1 = __webpack_require__(872);
 async function run() {
     await dotnet_1.default();
 }
-run().catch(console.error);
+run().catch(helpers_1.fail);
 exports.default = run;
 
 
@@ -24015,6 +24018,7 @@ async function downloadFile(localFilePath, url) {
 }
 exports.downloadFile = downloadFile;
 function fail(message) {
+    console.error(message);
     core_1.setFailed(message);
     throw new Error(message);
 }
