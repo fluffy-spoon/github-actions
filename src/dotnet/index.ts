@@ -80,7 +80,7 @@ async function dotnetNuGetPush(project: Project) {
     
     logDebug('publishing package', project.nuspecFilePath);
 
-    let version = getProjectVersion(gitHub);
+    let version = await getProjectVersion(project);
 
     await run("dotnet", [
         "nuget",
@@ -94,9 +94,9 @@ async function dotnetNuGetPush(project: Project) {
 }
 
 async function generateNuspecFileForProject(project: Project) {
-    let github = await getGitHubContext();
+    let version = await getProjectVersion(project);
 
-    let version = getProjectVersion(github);
+    let github = await getGitHubContext();
 
     let topics = github.repository.topics;
     let newNuspecContents = `<?xml version="1.0"?>
@@ -151,7 +151,16 @@ async function generateNuspecFileForProject(project: Project) {
         newNuspecContents);
 }
 
-function getProjectVersion(github: GitHubContext) {
+async function getProjectVersion(project: Project) {
+    if(existsSync(project.nuspecFilePath)) {
+        const existingNuspecContents = readFileSync(project.nuspecFilePath).toString();
+        const existingNuspecXml = await xml2js.parseStringPromise(existingNuspecContents);
+
+        return existingNuspecXml.package.metadata[0].version[0];
+    }
+
+    let github = await getGitHubContext();
+
     let version = 
         (github.latestRelease && github.latestRelease.name) ||
         '0.0.0';
