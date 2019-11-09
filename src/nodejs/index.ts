@@ -14,6 +14,9 @@ async function npmPublish(project: NodeJsPackage) {
 }
 
 export default async function handleNodeJs() {
+    logDebug('installing node');
+    await import('./setup-node/src/installer');
+
     logDebug('scanning for nodejs projects');
 
     var packageJsFiles = await globSearch("**/package.json", ["**/node_modules/**"]);
