@@ -70,13 +70,13 @@ export async function getGitHubContext(): Promise<GitHubContext> {
         let latestReleaseResponse = await client.repos.getLatestRelease({
             owner,
             repo
-        });
+        }).catch(() => null);
 
         return {
             client,
             repository: repositoryResponse.data,
             owner: userResponse.data,
-            latestRelease: latestReleaseResponse.data,
+            latestRelease: latestReleaseResponse && latestReleaseResponse.data,
             environment,
             token
         } as GitHubContext;
