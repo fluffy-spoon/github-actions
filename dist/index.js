@@ -583,7 +583,7 @@ async function npmPublish(project) {
 async function handleNodeJs() {
     helpers_1.logDebug('installing node');
     let nodeInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(111)));
-    await nodeInstaller.getNode('latest');
+    await nodeInstaller.getNode(void 0);
     helpers_1.logDebug('scanning for nodejs projects');
     var packageJsFiles = await helpers_1.globSearch("**/package.json", ["**/node_modules/**"]);
     helpers_1.logDebug('nodejs projects found', packageJsFiles);
