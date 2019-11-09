@@ -6,7 +6,7 @@ import { join } from "path";
 
 import { getGitHubContext } from './environment';
 
-import { setFailed, debug } from '@actions/core';
+import { setFailed, debug, error } from '@actions/core';
 import { exec } from '@actions/exec';
 
 import { ExecOptions } from '@actions/exec/lib/interfaces';
@@ -52,8 +52,12 @@ export async function runProcess(commandLine: string, args?: string[], options?:
 }
 
 export function fail(obj: any) {
-    console.error(obj);
+    logError(obj);
     setFailed(obj.message || obj);
+}
+
+export function logError(...params: any[]) {
+    error(JSON.stringify(params));
 }
 
 export function logDebug(...params: any[]) {

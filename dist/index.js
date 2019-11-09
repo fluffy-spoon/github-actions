@@ -27024,10 +27024,14 @@ async function runProcess(commandLine, args, options) {
 }
 exports.runProcess = runProcess;
 function fail(obj) {
-    console.error(obj);
+    logError(obj);
     core_1.setFailed(obj.message || obj);
 }
 exports.fail = fail;
+function logError(...params) {
+    core_1.error(JSON.stringify(params));
+}
+exports.logError = logError;
 function logDebug(...params) {
     core_1.debug(JSON.stringify(params));
 }
