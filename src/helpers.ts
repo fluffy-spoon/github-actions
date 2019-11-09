@@ -40,6 +40,7 @@ export async function downloadFile(localFilePath: string, url: string) {
     });
 }
 
-export function fail(message: any) {
-    setFailed('Error: ' + JSON.stringify(message));
+export function fail(obj: any) {
+    console.error(obj);
+    setFailed(obj.message || obj);
 }

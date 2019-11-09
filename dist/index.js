@@ -24038,8 +24038,9 @@ async function downloadFile(localFilePath, url) {
     });
 }
 exports.downloadFile = downloadFile;
-function fail(message) {
-    core_1.setFailed('Error: ' + JSON.stringify(message));
+function fail(obj) {
+    console.error(obj);
+    core_1.setFailed(obj.message || obj);
 }
 exports.fail = fail;
 
