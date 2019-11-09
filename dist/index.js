@@ -5862,7 +5862,7 @@ async function generateNuspecFileForProject(project) {
                 <repository type="git" url="${github.repository.git_url}" />
                 <projectUrl>${github.repository.html_url}</projectUrl>
                 <requireLicenseAcceptance>false</requireLicenseAcceptance>
-                <description>${github.repository.description || ''}</description>
+                <description>${github.repository.description || `The ${project.name} NuGet package.`}</description>
                 <releaseNotes>No release notes available.</releaseNotes>
                 <copyright>Copyright ${new Date().getFullYear()}</copyright>
                 <tags>
