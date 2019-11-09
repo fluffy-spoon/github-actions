@@ -11,7 +11,7 @@ export default class ProjectFileParser {
         console.log('read project file', filePath, filePath);
 
         var xml = await xml2js.parseStringPromise(fileContents);
-        console.log('parsed project file', filePath, xml);
+        console.log('parsed project file', filePath, JSON.stringify(xml));
 
         return {} as Project;
     }

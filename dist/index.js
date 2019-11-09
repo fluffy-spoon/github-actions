@@ -4285,7 +4285,7 @@ class ProjectFileParser {
         var fileContents = fs_1.default.readFileSync(filePath);
         console.log('read project file', filePath, filePath);
         var xml = await xml2js_1.default.parseStringPromise(fileContents);
-        console.log('parsed project file', filePath, xml);
+        console.log('parsed project file', filePath, JSON.stringify(xml));
         return {};
     }
 }
