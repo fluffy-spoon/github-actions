@@ -140,6 +140,7 @@ async function generateNuspecFileForProject(project: Project) {
         };
 
         newNuspecContents = new xml2js.Builder().buildObject(newNuspecXml);
+        writeFileSync(project.nuspecFilePath, newNuspecContents);
     }
 
     let nuspecPath = join(project.directoryPath, `${project.name}.nuspec`);

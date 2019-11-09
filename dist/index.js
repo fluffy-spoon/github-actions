@@ -5879,6 +5879,7 @@ async function generateNuspecFileForProject(project) {
         const existingNuspecXml = await xml2js_1.default.parseStringPromise(existingNuspecContents);
         newNuspecXml.package.metadata[0] = Object.assign(Object.assign({}, newNuspecXml.package.metadata[0]), existingNuspecXml.package.metadata[0]);
         newNuspecContents = new xml2js_1.default.Builder().buildObject(newNuspecXml);
+        fs_1.writeFileSync(project.nuspecFilePath, newNuspecContents);
     }
     let nuspecPath = path_1.join(project.directoryPath, `${project.name}.nuspec`);
     helpers_1.logDebug('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
