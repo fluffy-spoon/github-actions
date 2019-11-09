@@ -572,9 +572,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const helpers_1 = __webpack_require__(872);
 const package_json_parser_1 = __importDefault(__webpack_require__(140));
-async function npmCommand(project, command) {
-    helpers_1.logDebug('running command', command, project);
-    await helpers_1.runProcess("npm", ["run", command], {
+async function npmCommand(project, ...commandArgs) {
+    helpers_1.logDebug('running command', commandArgs, project);
+    await helpers_1.runProcess("npm", commandArgs, {
         cwd: project.directoryPath
     });
 }
@@ -596,9 +596,9 @@ async function handleNodeJs() {
         helpers_1.logDebug('project detected', packageJsFile, project);
         await npmCommand(project, 'install');
         if (project.hasBuildCommand)
-            await npmCommand(project, 'build');
+            await npmCommand(project, 'run', 'build');
         if (project.hasTestCommand)
-            await npmCommand(project, 'test');
+            await npmCommand(project, 'run', 'test');
         await npmPublish(project);
     }
 }
