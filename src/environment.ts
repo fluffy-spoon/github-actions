@@ -1,5 +1,6 @@
 import {GitHub} from '@actions/github';
 import core from '@actions/core';
+import { ReposGetResponse, UsersGetByUsernameResponse, ReposListCommitsResponseItem, ReposGetLatestReleaseResponse } from '@octokit/rest';
 
 enum KnownGitHubEnvironmentKey {
     WORKFLOW,
@@ -22,8 +23,9 @@ export type KnownGitHubEnvironmentKeyObject = {
 export type GitHubContext = {
     client: GitHub,
     environment: KnownGitHubEnvironmentKeyObject,
-    owner: string,
-    repo: string,
+    repository: ReposGetResponse,
+    owner: UsersGetByUsernameResponse,
+    latestRelease: ReposGetLatestReleaseResponse,
     token: string
 };
 
@@ -42,13 +44,30 @@ export async function getGitHubContext(): Promise<GitHubContext> {
 
         let [owner, repo] = environment.REPOSITORY.split('/');
 
-        return {
-            client: new GitHub(token),
-            environment,
+        let client = new GitHub(token);
+
+        let userResponse = await client.users.getByUsername({
+            username: owner
+        });
+
+        let repositoryResponse = await client.repos.get({
             owner,
-            repo,
+            repo
+        });
+
+        let latestReleaseResponse = await client.repos.getLatestRelease({
+            owner,
+            repo
+        });
+
+        return {
+            client,
+            repository: repositoryResponse.data,
+            owner: userResponse.data,
+            latestRelease: latestReleaseResponse.data,
+            environment,
             token
-        };
+        } as GitHubContext;
     });
 
     return cachedContextPromise;

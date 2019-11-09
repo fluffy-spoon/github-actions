@@ -1,6 +1,6 @@
 import xml2js from 'xml2js';
 import fs from 'fs';
-import { basename, extname } from 'path';
+import { basename, extname, dirname, join } from 'path';
 
 export type StringBoolean = 'true' | 'false';
 export type TestSdkString = 'Microsoft.NET.Test.Sdk' | string;
@@ -9,15 +9,18 @@ export type SdkString =
     TestSdkString |
     string;
 
+export interface PropertyGroupXmlNode {
+    TargetFramework?: ['netstandard2.0'],
+    IsPackable?: [StringBoolean],
+    NuspecFile?: string
+};
+
 export interface ProjectFileXmlNode {
     Project: {
         $: {
             Sdk: SdkString
         },
-        PropertyGroup: Array<{
-            TargetFramework: ['netstandard2.0'],
-            IsPackable: [StringBoolean]
-        }>,
+        PropertyGroup: Array<PropertyGroupXmlNode>,
         ItemGroup: Array<{
             PackageReference: Array<{
                 $: {
@@ -38,7 +41,9 @@ export interface Project {
     xmlNode: ProjectFileXmlNode;
     isTestProject: boolean;
     packageReferences: PackageReference[];
-    filePath: string;
+    csprojFilePath: string;
+    directoryPath: string;
+    nuspecFilePath: string;
     name: string;
 }
 
@@ -54,7 +59,6 @@ export default class ProjectFileParser {
         knownTestSdkStrings.push('Microsoft.NET.Test.Sdk');
 
         let packageReferences = new Array<PackageReference>();
-
         if(xml.Project.ItemGroup) {
 
             for (let itemGroupElement of xml.Project.ItemGroup) {
@@ -71,15 +75,33 @@ export default class ProjectFileParser {
 
         }
 
+        let properties = new Array<PropertyGroupXmlNode>();
+        if(xml.Project.PropertyGroup) {
+
+            for(let propertyGroupElement of xml.Project.PropertyGroup) {
+                properties.push(propertyGroupElement);
+            }
+
+        }
+
         let isTestProject = packageReferences.findIndex(
             p => knownTestSdkStrings.indexOf(p.name) > -1) > -1;
+
+        let directoryPath = dirname(filePath);
+        let name = basename(filePath, extname(filePath));
+
+        let nuspecFilePath = 
+            properties.map(p => p.NuspecFile).find(p => !!p) ||
+            join(directoryPath, `${name}.nuspec`);
 
         return {
             xmlNode: xml,
             isTestProject,
             packageReferences,
-            filePath,
-            name: basename(filePath, extname(filePath))
+            csprojFilePath: filePath,
+            nuspecFilePath,
+            name,
+            directoryPath
         };
     }
 }

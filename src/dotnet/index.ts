@@ -1,50 +1,53 @@
-import path, { join, basename, extname } from 'path';
+import { join, basename, extname, dirname } from 'path';
 
 import { exec } from '@actions/exec';
+
 import { ExecOptions } from '@actions/exec/lib/interfaces';
 
-import { globSearch } from '../helpers';
 import SolutionFileParser from './solution-file-parser';
+import xml2js from 'xml2js';
+
 import { getGitHubContext } from '../environment';
+import { globSearch, fail } from '../helpers';
+import { Project } from './project-file-parser';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
 
 async function run(commandLine: string, args?: string[], options?: ExecOptions) {
     let result = await exec(commandLine, args, options);
     if(result !== 0)
-        throw new Error('Process ' + commandLine + ' exited with non-zero exit code: ' + result);
+        return fail('Process ' + commandLine + ' exited with non-zero exit code: ' + result);
 }
 
-async function compileSolutionFile(solutionFile: string) {
+async function dotnetBuild(solutionFile: string) {
     console.log('building', solutionFile);
     await run("dotnet", ["build"], {
-        cwd: path.dirname(solutionFile)
+        cwd: dirname(solutionFile)
     });
 }
 
-async function testSolutionFile(solutionFile: string) {
+async function dotnetTest(solutionFile: string) {
     console.log('testing', solutionFile);
     await run("dotnet", ["test"], {
-        cwd: path.dirname(solutionFile)
+        cwd: dirname(solutionFile)
     });
 }
 
-async function packSolutionFile(solutionFile: string) {
-    console.log('packing', solutionFile);
+async function dotnetPack(project: Project) {
+    console.log('packing', project.csprojFilePath);
 
-    let gitHub = await getGitHubContext();
     await run("dotnet", [
         "pack",
-        "--output",
-        __dirname,
         "--include-symbols",
+        "--include-source",
         "-p:SymbolPackageFormat=snupkg",
-        "-properties",
-        `owners=${gitHub.owner};desc=`
+        `-p:NuspecFile=${project.nuspecFilePath}`,
+        `-p:NuspecBasePath=${project.directoryPath}`
     ], {
-        cwd: path.dirname(solutionFile)
+        cwd: project.directoryPath
     });
 }
 
-async function pushNuGetPackage(nuGetFile: string) {
+async function dotnetNuGetPush(nuGetFile: string) {
     console.log('adding package source', nuGetFile);
     
     let gitHub = await getGitHubContext();
@@ -55,13 +58,13 @@ async function pushNuGetPackage(nuGetFile: string) {
         "-Name",
         "GPR",
         "-Source",
-        `https://nuget.pkg.github.com/${gitHub.owner}/index.json`,
+        `https://nuget.pkg.github.com/${gitHub.owner.login}/index.json`,
         "-UserName",
-        gitHub.owner,
+        gitHub.repository.owner.login,
         "-Password",
         gitHub.token
     ], {
-        cwd: path.dirname(nuGetFile)
+        cwd: dirname(nuGetFile)
     });
     
     console.log('publishing package', nuGetFile);
@@ -73,32 +76,96 @@ async function pushNuGetPackage(nuGetFile: string) {
         "-Source",
         "GPR"
     ], {
-        cwd: path.dirname(nuGetFile)
+        cwd: dirname(nuGetFile)
     });
+}
+
+async function generateNuspecFileForProject(project: Project) {
+    let github = await getGitHubContext();
+
+    let version = 
+        (github.latestRelease && github.latestRelease.name) ||
+        '1.0.0';
+
+    version = (+(version.substr(0, 1)) + 1) + version.substr(1);
+
+    const newNuspecContents = `<?xml version="1.0"?>
+        <package>
+            <metadata>
+                <id>${project.name}</id>
+                <version>${version}</version>
+                <authors>${github.owner.name} (${github.owner.login})</authors>
+                <owners>${github.owner.name} (${github.owner.login})</owners>
+                <readme>README.md</readme>
+                ${github.repository.license && github.repository.license.url ?
+                    `<licenseUrl>${github.repository.license.url}</licenseUrl>` :
+                    ''}
+                <repository type="git" url="${github.repository.git_url}" />
+                <projectUrl>${github.repository.html_url}</projectUrl>
+                <requireLicenseAcceptance>false</requireLicenseAcceptance>
+                <description>${github.repository.description}</description>
+                <releaseNotes>No release notes available.</releaseNotes>
+                <copyright>Copyright ${new Date().getFullYear()}</copyright>
+                <tags>${github.repository.topics.join(', ')}</tags>
+                <dependencies>
+                    ${project.packageReferences
+                        .map(x => `<dependency id="${x.name}" version="${x.version}" />`)
+                        .join()}
+                </dependencies>
+            </metadata>
+        </package>`;
+    const newNuspecXml = await xml2js.parseStringPromise(newNuspecContents);
+
+    if(existsSync(project.nuspecFilePath)) {
+        const existingNuspecContents = readFileSync(project.nuspecFilePath).toString();
+        const existingNuspecXml = await xml2js.parseStringPromise(existingNuspecContents);
+
+        //TODO: merge
+    }
+
+    let nuspecPath = join(project.directoryPath, `${project.name}.nuspec`);
+    console.log('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
+
+    writeFileSync(
+        nuspecPath,
+        newNuspecContents);
 }
 
 export default async function handleDotNet() {
     var solutionFiles = await globSearch("**/*.sln");
     for (let solutionFile of solutionFiles) {
-        let projectFiles = await SolutionFileParser.getProjects(solutionFile);
-        console.log('projects detected', solutionFile, projectFiles);
+        let projects = await SolutionFileParser.getProjects(solutionFile);
+        console.log('projects detected', solutionFile, projects);
 
-        await compileSolutionFile(solutionFile);
-        await testSolutionFile(solutionFile);
-        await packSolutionFile(solutionFile);
+        let testProjects = projects.filter(x => x.isTestProject);
+        for(let project of testProjects) {
+            await dotnetBuild(project.csprojFilePath);
+            await dotnetTest(project.csprojFilePath);
+        }
+
+        let nonTestProjects = projects.filter(x => !x.isTestProject);
+        for(let project of nonTestProjects) {
+            await generateNuspecFileForProject(project);
+
+            await dotnetBuild(project.csprojFilePath);
+            await dotnetPack(project);
+        }
+
+        for(let project of nonTestProjects)
+            console.log('todo-push', project.directoryPath);
 
         let nugetFiles = await globSearch(join(__dirname, '*.nupkg'));
         for(let nugetFile of nugetFiles) {
             let fileName = basename(nugetFile, extname(nugetFile));
 
-            let matchingProject = projectFiles.find(x => x.name === fileName);
+            let matchingProject = projects.find(x => x.name === fileName);
             if(!matchingProject)
-                throw new Error('Could not find a project called ' + fileName + ' in the solution, inferred from the .nupkg file.');
+                return fail('Could not find a project called ' + fileName + ' in the solution, inferred from the .nupkg file.');
 
             if(matchingProject.isTestProject)
                 continue;
 
-            await pushNuGetPackage(nugetFile);
+            await dotnetNuGetPush(nugetFile);
         }
     }
 }
