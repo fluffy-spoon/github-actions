@@ -1,27 +1,17 @@
 import { join, dirname } from 'path';
 
-import { exec } from '@actions/exec';
-
-import { ExecOptions } from '@actions/exec/lib/interfaces';
-
 import SolutionFileParser from './solution-file-parser';
 import xml2js from 'xml2js';
 
-import { getGitHubContext, GitHubContext } from '../environment';
-import { globSearch, fail, logDebug } from '../helpers';
+import { getGitHubContext } from '../environment';
+import { globSearch, logDebug, runProcess } from '../helpers';
 import { Project } from './project-file-parser';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-
-async function run(commandLine: string, args?: string[], options?: ExecOptions) {
-    let result = await exec(commandLine, args, options);
-    if(result !== 0)
-        return fail('Process ' + commandLine + ' exited with non-zero exit code: ' + result);
-}
 
 async function dotnetBuild(solutionFile: string) {
     logDebug('building', solutionFile);
 
-    await run("dotnet", ["build"], {
+    await runProcess("dotnet", ["build"], {
         cwd: dirname(solutionFile)
     });
 }
@@ -29,7 +19,7 @@ async function dotnetBuild(solutionFile: string) {
 async function dotnetTest(solutionFile: string) {
     logDebug('testing', solutionFile);
 
-    await run("dotnet", ["test"], {
+    await runProcess("dotnet", ["test"], {
         cwd: dirname(solutionFile)
     });
 }
@@ -39,7 +29,7 @@ async function dotnetPack(project: Project) {
 
     await generateNuspecFileForProject(project);
 
-    await run("dotnet", [
+    await runProcess("dotnet", [
         "pack",
         "--include-symbols",
         "--include-source",
@@ -82,7 +72,7 @@ async function dotnetNuGetPush(project: Project) {
 
     let version = await getProjectVersion(project);
 
-    await run("dotnet", [
+    await runProcess("dotnet", [
         "nuget",
         "push",
         join(project.directoryPath, `${project.name}.${version}.nupkg`),
@@ -172,6 +162,9 @@ async function getProjectVersion(project: Project) {
 }
 
 export default async function handleDotNet() {
+    logDebug('installing dotnet');
+    await import('./setup-dotnet/src/installer');
+
     logDebug('scanning for solutions');
 
     var solutionFiles = await globSearch("**/*.sln");

@@ -3,15 +3,22 @@ import fs from 'fs';
 import http from 'http';
 
 import { join } from "path";
-import { getGitHubContext } from './environment';
-import { setFailed, debug } from '@actions/core';
 
-export async function globSearch(pattern: string) {
+import { getGitHubContext } from './environment';
+
+import { setFailed, debug } from '@actions/core';
+import { exec } from '@actions/exec';
+
+import { ExecOptions } from '@actions/exec/lib/interfaces';
+
+export async function globSearch(pattern: string, ignore?: string[]) {
     logDebug('begin-glob', pattern);
 
     let context = await getGitHubContext();
     return new Promise<string[]>((resolve, reject) =>
-        glob(join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
+        glob(join(context.environment.WORKSPACE, pattern), {
+            ignore: ignore || []
+        }, (err, files) => {
             if (err) {
                 logDebug('err-glob', pattern, err);
                 return reject(err);
@@ -36,6 +43,12 @@ export async function downloadFile(localFilePath: string, url: string) {
             reject(err);
         });
     });
+}
+
+export async function runProcess(commandLine: string, args?: string[], options?: ExecOptions) {
+    let result = await exec(commandLine, args, options);
+    if(result !== 0)
+        return fail('Process ' + commandLine + ' exited with non-zero exit code: ' + result);
 }
 
 export function fail(obj: any) {

@@ -1,0 +1,3 @@
+[submodule "src/dotnet/setup-dotnet"]
+	path = src/dotnet/setup-dotnet
+	url = https://github.com/actions/setup-dotnet
