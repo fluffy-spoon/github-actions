@@ -582,7 +582,8 @@ async function npmPublish(project) {
 }
 async function handleNodeJs() {
     helpers_1.logDebug('installing node');
-    await Promise.resolve().then(() => __importStar(__webpack_require__(111)));
+    let nodeInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(111)));
+    await nodeInstaller.getNode('latest');
     helpers_1.logDebug('scanning for nodejs projects');
     var packageJsFiles = await helpers_1.globSearch("**/package.json", ["**/node_modules/**"]);
     helpers_1.logDebug('nodejs projects found', packageJsFiles);
@@ -6781,7 +6782,8 @@ async function getProjectVersion(project) {
 }
 async function handleDotNet() {
     helpers_1.logDebug('installing dotnet');
-    await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
+    let dotnetInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
+    await new dotnetInstaller.DotnetCoreInstaller(void 0).installDotnet();
     helpers_1.logDebug('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
     helpers_1.logDebug('solutions found', solutionFiles);

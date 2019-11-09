@@ -164,7 +164,9 @@ async function getProjectVersion(project: Project) {
 
 export default async function handleDotNet() {
     logDebug('installing dotnet');
-    await import('./setup-dotnet/src/installer');
+
+    let dotnetInstaller = await import('./setup-dotnet/src/installer');
+    await new dotnetInstaller.DotnetCoreInstaller(void 0).installDotnet();
 
     logDebug('scanning for solutions');
 
