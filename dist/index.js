@@ -5733,7 +5733,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip1";
+        const unzipPath = __webpack_require__.ab + "unzip";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
@@ -6795,7 +6795,7 @@ async function getProjectVersion(project) {
 async function handleDotNet() {
     helpers_1.logDebug('installing dotnet');
     let dotnetInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(284)));
-    await new dotnetInstaller.DotnetCoreInstaller('').installDotnet();
+    await new dotnetInstaller.DotnetCoreInstaller('3.0.100').installDotnet();
     helpers_1.logDebug('scanning for solutions');
     var solutionFiles = await helpers_1.globSearch("**/*.sln");
     helpers_1.logDebug('solutions found', solutionFiles);
@@ -19838,7 +19838,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip";
+        const unzipPath = __webpack_require__.ab + "unzip1";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
