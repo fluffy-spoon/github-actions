@@ -44,6 +44,8 @@ export async function getGitHubContext(): Promise<GitHubContext> {
 
         let [owner, repo] = environment.REPOSITORY.split('/');
 
+        console.log('initializing context', environment, token.length);
+
         let client = new GitHub(token);
 
         let userResponse = await client.users.getByUsername({
