@@ -9,7 +9,7 @@ import { ExecOptions } from '@actions/exec/lib/interfaces';
 import SolutionFileParser from './solution-file-parser';
 import xml2js from 'xml2js';
 
-import { getGitHubContext } from '../environment';
+import { getGitHubContext, GitHubContext } from '../environment';
 import { globSearch, fail } from '../helpers';
 import { Project } from './project-file-parser';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
@@ -49,8 +49,8 @@ async function dotnetPack(project: Project) {
     });
 }
 
-async function dotnetNuGetPush(nuGetFile: string) {
-    console.log('adding package source', nuGetFile);
+async function dotnetNuGetPush(project: Project) {
+    console.log('adding package source', project.nuspecFilePath);
     
     let gitHub = await getGitHubContext();
     await run("dotnet", [
@@ -66,32 +66,31 @@ async function dotnetNuGetPush(nuGetFile: string) {
         "-Password",
         gitHub.token
     ], {
-        cwd: dirname(nuGetFile)
+        cwd: project.directoryPath
     });
     
-    console.log('publishing package', nuGetFile);
+    console.log('publishing package', project.nuspecFilePath);
+
+    let version = getProjectVersion(gitHub);
 
     await run("dotnet", [
         "nuget",
         "push",
-        nuGetFile,
+        join(project.directoryPath, `${project.name}.${version}.nupkg`),
         "-Source",
         "GPR"
     ], {
-        cwd: dirname(nuGetFile)
+        cwd: project.directoryPath
     });
 }
 
 async function generateNuspecFileForProject(project: Project) {
     let github = await getGitHubContext();
 
-    let version = 
-        (github.latestRelease && github.latestRelease.name) ||
-        '1.0.0';
+    let version = getProjectVersion(github);
 
-    version = (+(version.substr(0, 1)) + 1) + version.substr(1);
-
-    const newNuspecContents = `<?xml version="1.0"?>
+    let topics = github.repository.topics;
+    let newNuspecContents = `<?xml version="1.0"?>
         <package>
             <metadata>
                 <id>${project.name}</id>
@@ -105,10 +104,14 @@ async function generateNuspecFileForProject(project: Project) {
                 <repository type="git" url="${github.repository.git_url}" />
                 <projectUrl>${github.repository.html_url}</projectUrl>
                 <requireLicenseAcceptance>false</requireLicenseAcceptance>
-                <description>${github.repository.description}</description>
+                <description>${github.repository.description || ''}</description>
                 <releaseNotes>No release notes available.</releaseNotes>
                 <copyright>Copyright ${new Date().getFullYear()}</copyright>
-                <tags>${github.repository.topics && github.repository.topics.join(', ')}</tags>
+                <tags>
+                    ${topics ?
+                        topics.join(', ') :
+                        ''}
+                </tags>
                 <dependencies>
                     ${project.packageReferences
                         .map(x => `<dependency id="${x.name}" version="${x.version}" />`)
@@ -122,7 +125,12 @@ async function generateNuspecFileForProject(project: Project) {
         const existingNuspecContents = readFileSync(project.nuspecFilePath).toString();
         const existingNuspecXml = await xml2js.parseStringPromise(existingNuspecContents);
 
-        //TODO: merge
+        newNuspecXml.package.metadata[0] = { 
+            ... newNuspecXml.package.metadata[0],
+            ... existingNuspecXml.package.metadata[0]
+        };
+
+        newNuspecContents = new xml2js.Builder().buildObject(newNuspecXml);
     }
 
     let nuspecPath = join(project.directoryPath, `${project.name}.nuspec`);
@@ -131,6 +139,16 @@ async function generateNuspecFileForProject(project: Project) {
     writeFileSync(
         nuspecPath,
         newNuspecContents);
+}
+
+function getProjectVersion(github: GitHubContext) {
+    let version = 
+        (github.latestRelease && github.latestRelease.name) ||
+        '0.0.0';
+
+    version = (+(version.substr(0, 1)) + 1) + version.substr(1);
+
+    return version;
 }
 
 export default async function handleDotNet() {
@@ -158,6 +176,6 @@ export default async function handleDotNet() {
         }
 
         for(let project of nonTestProjects)
-            console.log('todo-push', project.directoryPath);
+            await dotnetNuGetPush(project);
     }
 }

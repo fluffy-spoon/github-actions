@@ -5814,8 +5814,8 @@ async function dotnetPack(project) {
         cwd: project.directoryPath
     });
 }
-async function dotnetNuGetPush(nuGetFile) {
-    console.log('adding package source', nuGetFile);
+async function dotnetNuGetPush(project) {
+    console.log('adding package source', project.nuspecFilePath);
     let gitHub = await environment_1.getGitHubContext();
     await run("dotnet", [
         "nuget",
@@ -5830,25 +5830,25 @@ async function dotnetNuGetPush(nuGetFile) {
         "-Password",
         gitHub.token
     ], {
-        cwd: path_1.dirname(nuGetFile)
+        cwd: project.directoryPath
     });
-    console.log('publishing package', nuGetFile);
+    console.log('publishing package', project.nuspecFilePath);
+    let version = getProjectVersion(gitHub);
     await run("dotnet", [
         "nuget",
         "push",
-        nuGetFile,
+        path_1.join(project.directoryPath, `${project.name}.${version}.nupkg`),
         "-Source",
         "GPR"
     ], {
-        cwd: path_1.dirname(nuGetFile)
+        cwd: project.directoryPath
     });
 }
 async function generateNuspecFileForProject(project) {
     let github = await environment_1.getGitHubContext();
-    let version = (github.latestRelease && github.latestRelease.name) ||
-        '1.0.0';
-    version = (+(version.substr(0, 1)) + 1) + version.substr(1);
-    const newNuspecContents = `<?xml version="1.0"?>
+    let version = getProjectVersion(github);
+    let topics = github.repository.topics;
+    let newNuspecContents = `<?xml version="1.0"?>
         <package>
             <metadata>
                 <id>${project.name}</id>
@@ -5862,10 +5862,14 @@ async function generateNuspecFileForProject(project) {
                 <repository type="git" url="${github.repository.git_url}" />
                 <projectUrl>${github.repository.html_url}</projectUrl>
                 <requireLicenseAcceptance>false</requireLicenseAcceptance>
-                <description>${github.repository.description}</description>
+                <description>${github.repository.description || ''}</description>
                 <releaseNotes>No release notes available.</releaseNotes>
                 <copyright>Copyright ${new Date().getFullYear()}</copyright>
-                <tags>${github.repository.topics && github.repository.topics.join(', ')}</tags>
+                <tags>
+                    ${topics ?
+        topics.join(', ') :
+        ''}
+                </tags>
                 <dependencies>
                     ${project.packageReferences
         .map(x => `<dependency id="${x.name}" version="${x.version}" />`)
@@ -5877,11 +5881,18 @@ async function generateNuspecFileForProject(project) {
     if (fs_1.existsSync(project.nuspecFilePath)) {
         const existingNuspecContents = fs_1.readFileSync(project.nuspecFilePath).toString();
         const existingNuspecXml = await xml2js_1.default.parseStringPromise(existingNuspecContents);
-        //TODO: merge
+        newNuspecXml.package.metadata[0] = Object.assign(Object.assign({}, newNuspecXml.package.metadata[0]), existingNuspecXml.package.metadata[0]);
+        newNuspecContents = new xml2js_1.default.Builder().buildObject(newNuspecXml);
     }
     let nuspecPath = path_1.join(project.directoryPath, `${project.name}.nuspec`);
     console.log('generated nuspec', nuspecPath, newNuspecContents, JSON.stringify(newNuspecXml));
     fs_1.writeFileSync(nuspecPath, newNuspecContents);
+}
+function getProjectVersion(github) {
+    let version = (github.latestRelease && github.latestRelease.name) ||
+        '0.0.0';
+    version = (+(version.substr(0, 1)) + 1) + version.substr(1);
+    return version;
 }
 async function handleDotNet() {
     console.log('scanning for solutions');
@@ -5902,7 +5913,7 @@ async function handleDotNet() {
             await dotnetPack(project);
         }
         for (let project of nonTestProjects)
-            console.log('todo-push', project.directoryPath);
+            await dotnetNuGetPush(project);
     }
 }
 exports.default = handleDotNet;
@@ -24028,9 +24039,7 @@ async function downloadFile(localFilePath, url) {
 }
 exports.downloadFile = downloadFile;
 function fail(message) {
-    console.error(message);
-    core_1.setFailed(message);
-    throw new Error(message);
+    core_1.setFailed('Error: ' + JSON.stringify(message));
 }
 exports.fail = fail;
 
