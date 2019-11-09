@@ -35,6 +35,8 @@ export async function getGitHubContext(): Promise<GitHubContext> {
     if(cachedContextPromise)
         return cachedContextPromise;
 
+    console.log('fetching context');
+
     cachedContextPromise = new Promise<GitHubContext>(async () => {
         const token = getInput('gitHubKey');
 
