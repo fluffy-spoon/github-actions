@@ -583,7 +583,7 @@ async function npmPublish(project) {
 async function handleNodeJs() {
     helpers_1.logDebug('installing node');
     let nodeInstaller = await Promise.resolve().then(() => __importStar(__webpack_require__(111)));
-    await nodeInstaller.getNode(void 0);
+    await nodeInstaller.getNode('10.x');
     helpers_1.logDebug('scanning for nodejs projects');
     var packageJsFiles = await helpers_1.globSearch("**/package.json", ["**/node_modules/**"]);
     helpers_1.logDebug('nodejs projects found', packageJsFiles);
@@ -5721,7 +5721,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip";
+        const unzipPath = __webpack_require__.ab + "unzip1";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }
@@ -19826,7 +19826,7 @@ function extractZipWin(file, dest) {
 }
 function extractZipNix(file, dest) {
     return __awaiter(this, void 0, void 0, function* () {
-        const unzipPath = __webpack_require__.ab + "unzip1";
+        const unzipPath = __webpack_require__.ab + "unzip";
         yield exec_1.exec(`"${unzipPath}"`, [file], { cwd: dest });
     });
 }

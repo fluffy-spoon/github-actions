@@ -17,7 +17,7 @@ export default async function handleNodeJs() {
     logDebug('installing node');
 
     let nodeInstaller = await import('./setup-node/src/installer');
-    await nodeInstaller.getNode(void 0);
+    await nodeInstaller.getNode('10.x');
 
     logDebug('scanning for nodejs projects');
 
