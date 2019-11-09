@@ -593,6 +593,7 @@ async function handleNodeJs() {
     for (let packageJsFile of packageJsFiles) {
         let project = package_json_parser_1.default.readPackage(packageJsFile);
         helpers_1.logDebug('project detected', packageJsFile, project);
+        await npmCommand(project, 'install');
         if (project.hasBuildCommand)
             await npmCommand(project, 'build');
         if (project.hasTestCommand)
