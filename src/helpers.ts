@@ -9,12 +9,17 @@ import { getGitHubContext } from './environment';
 import { setFailed } from '@actions/core';
 
 export async function globSearch(pattern: string) {
+    console.log('begin-glob', pattern);
+
     let context = await getGitHubContext();
     return new Promise<string[]>((resolve, reject) =>
         glob(join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
-            if (err)
+            if (err) {
+                console.log('err-glob', pattern, err);
                 return reject(err);
+            }
 
+            console.log('end-glob', pattern, files);
             return resolve(files);
         }));
 }

@@ -23999,10 +23999,14 @@ const path_1 = __webpack_require__(622);
 const environment_1 = __webpack_require__(89);
 const core_1 = __webpack_require__(470);
 async function globSearch(pattern) {
+    console.log('begin-glob', pattern);
     let context = await environment_1.getGitHubContext();
     return new Promise((resolve, reject) => glob_1.default(path_1.join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
-        if (err)
+        if (err) {
+            console.log('err-glob', pattern, err);
             return reject(err);
+        }
+        console.log('end-glob', pattern, files);
         return resolve(files);
     }));
 }
