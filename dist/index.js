@@ -5297,10 +5297,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotnet_1 = __importDefault(__webpack_require__(216));
+const helpers_1 = __webpack_require__(872);
 async function run() {
     await dotnet_1.default();
 }
-run();
+run().catch(helpers_1.fail);
 exports.default = run;
 
 
@@ -23989,7 +23990,7 @@ const fs_1 = __importDefault(__webpack_require__(747));
 const http_1 = __importDefault(__webpack_require__(605));
 const path_1 = __webpack_require__(622);
 const environment_1 = __webpack_require__(89);
-const core_1 = __webpack_require__(470);
+// import { setFailed } from '@actions/core';
 async function globSearch(pattern) {
     let context = await environment_1.getGitHubContext();
     return new Promise((resolve, reject) => glob_1.default(path_1.join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
@@ -24017,7 +24018,7 @@ async function downloadFile(localFilePath, url) {
 exports.downloadFile = downloadFile;
 function fail(message) {
     console.error(message);
-    core_1.setFailed(message);
+    // setFailed(message);
     throw new Error(message);
 }
 exports.fail = fail;

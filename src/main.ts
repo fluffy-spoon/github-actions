@@ -5,5 +5,5 @@ async function run() {
     await handleDotNet();
 }
 
-run();
+run().catch(fail);
 export default run; 
