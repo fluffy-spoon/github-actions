@@ -17,11 +17,13 @@ export default async function handleNodeJs() {
     logDebug('scanning for nodejs projects');
 
     var packageJsFiles = await globSearch("**/package.json", ["**/node_modules/**"]);
+    logDebug('nodejs projects found', packageJsFiles);
+
     packageJsFiles = packageJsFiles
         .sort((a, b) => b.length - a.length)
         .filter(x => !!packageJsFiles.find(y => y !== x && y.indexOf(x) > -1));
 
-    logDebug('nodejs projects found', packageJsFiles);
+    logDebug('nodejs projects filtered', packageJsFiles);
 
     for (let packageJsFile of packageJsFiles) {
         let project = PackageJsonParser.readPackage(packageJsFile);
