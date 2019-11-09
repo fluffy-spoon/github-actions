@@ -13,7 +13,8 @@ async function gitCommand(args: string[]) {
 
 async function gitCheckout() {
     let github = await getGitHubContext();
-    await gitCommand(['clone', '--recurse-submodules', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+    await gitCommand(['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+    await gitCommand(['submodule', 'update', '--init', '--recursive']);
 }
 
 async function run() {
