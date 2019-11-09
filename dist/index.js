@@ -5450,14 +5450,22 @@ const dotnet_1 = __importDefault(__webpack_require__(216));
 const helpers_1 = __webpack_require__(872);
 const nodejs_1 = __importDefault(__webpack_require__(25));
 const environment_1 = __webpack_require__(89);
-async function run() {
+async function gitCommand(args) {
     let github = await environment_1.getGitHubContext();
-    await helpers_1.runProcess('git', ['fetch'], {
+    return await helpers_1.runProcess('git', args, {
         cwd: github.environment.WORKSPACE
     });
-    await helpers_1.runProcess('git', ['pull'], {
-        cwd: github.environment.WORKSPACE
-    });
+}
+async function gitCheckout() {
+    let github = await environment_1.getGitHubContext();
+    await gitCommand(['init']);
+    await gitCommand(['remote', 'add', 'origin', github.repository.git_url]);
+    await gitCommand(['config', 'gc.auto', '0']);
+    await gitCommand(['fetch', '--tags', '--prune', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
+    await gitCommand(['checkout', '--progress', '--force', github.environment.SHA]);
+}
+async function run() {
+    await gitCheckout();
     await nodejs_1.default();
     await dotnet_1.default();
 }
