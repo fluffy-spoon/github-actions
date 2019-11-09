@@ -5449,7 +5449,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotnet_1 = __importDefault(__webpack_require__(216));
 const helpers_1 = __webpack_require__(872);
 const nodejs_1 = __importDefault(__webpack_require__(25));
+const environment_1 = __webpack_require__(89);
 async function run() {
+    let github = await environment_1.getGitHubContext();
+    await helpers_1.runProcess('git', ['fetch'], {
+        cwd: github.environment.WORKSPACE
+    });
+    await helpers_1.runProcess('git', ['pull'], {
+        cwd: github.environment.WORKSPACE
+    });
     await nodejs_1.default();
     await dotnet_1.default();
 }
