@@ -3,18 +3,25 @@ import { fail, runProcess } from "./helpers";
 import handleNodeJs from "./nodejs";
 import { getGitHubContext } from "./environment";
 import { ExecOptions } from "@actions/exec/lib/interfaces";
+import { join } from "path";
 
-async function gitCommand(args: string[]) {
+async function gitCommand(cwd: string, args: string[]) {
     let github = await getGitHubContext();
     return await runProcess('/usr/bin/git', args, {
-        cwd: github.environment.WORKSPACE
+        cwd
     });
 }
 
 async function gitCheckout() {
     let github = await getGitHubContext();
-    await gitCommand(['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
-    await gitCommand(['submodule', 'update', '--init', '--recursive']);
+    
+    await gitCommand(
+        github.environment.WORKSPACE, 
+        ['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+    
+    await gitCommand(
+        join(github.environment.WORKSPACE, github.repository.name), 
+        ['submodule', 'update', '--init', '--recursive']);
 }
 
 async function run() {

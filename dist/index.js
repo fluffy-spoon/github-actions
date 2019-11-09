@@ -5951,16 +5951,17 @@ const dotnet_1 = __importDefault(__webpack_require__(216));
 const helpers_1 = __webpack_require__(872);
 const nodejs_1 = __importDefault(__webpack_require__(25));
 const environment_1 = __webpack_require__(89);
-async function gitCommand(args) {
+const path_1 = __webpack_require__(622);
+async function gitCommand(cwd, args) {
     let github = await environment_1.getGitHubContext();
     return await helpers_1.runProcess('/usr/bin/git', args, {
-        cwd: github.environment.WORKSPACE
+        cwd
     });
 }
 async function gitCheckout() {
     let github = await environment_1.getGitHubContext();
-    await gitCommand(['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
-    await gitCommand(['submodule', 'update', '--init', '--recursive']);
+    await gitCommand(github.environment.WORKSPACE, ['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+    await gitCommand(path_1.join(github.environment.WORKSPACE, github.repository.name), ['submodule', 'update', '--init', '--recursive']);
 }
 async function run() {
     await gitCheckout();
