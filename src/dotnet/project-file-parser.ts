@@ -1,5 +1,6 @@
 import xml2js from 'xml2js';
 import fs from 'fs';
+import { basename, extname } from 'path';
 
 export type StringBoolean = 'true' | 'false';
 export type TestSdkString = 'Microsoft.NET.Test.Sdk' | string;
@@ -37,6 +38,8 @@ export interface Project {
     xmlNode: ProjectFileXmlNode;
     isTestProject: boolean;
     packageReferences: PackageReference[];
+    filePath: string;
+    name: string;
 }
 
 export default class ProjectFileParser {
@@ -74,7 +77,9 @@ export default class ProjectFileParser {
         return {
             xmlNode: xml,
             isTestProject,
-            packageReferences
+            packageReferences,
+            filePath,
+            name: basename(filePath, extname(filePath))
         };
     }
 }

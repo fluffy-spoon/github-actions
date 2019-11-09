@@ -2,12 +2,6 @@ import fs from 'fs';
 import { dirname, join, sep } from 'path';
 import ProjectFileParser, { Project } from './project-file-parser';
 
-export interface ProjectFile {
-    filePath: string;
-    name: string;
-    parsedProject: Project
-}
-
 export default class SolutionFileParser {
     static async getProjects(solutionFile: string) {
         let guidRegex = `\\{[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}\\}`;
@@ -19,7 +13,7 @@ export default class SolutionFileParser {
             .replace('\r', '')
             .split('\n');
 
-        let projects = new Array<ProjectFile>();
+        let projects = new Array<Project>();
 
         for(let line of lines) {
             let match = projectLineRegex.exec(line);
@@ -31,11 +25,7 @@ export default class SolutionFileParser {
             let projectFilePath = join(
                 dirname(solutionFile),
                 match[2]).replace(/\\/g, sep);
-            projects.push({
-                filePath: projectFilePath,
-                name: match[1],
-                parsedProject: await ProjectFileParser.readProject(projectFilePath)
-            });
+            projects.push(await ProjectFileParser.readProject(projectFilePath));
         }
 
         return projects;

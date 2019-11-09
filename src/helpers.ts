@@ -1,11 +1,11 @@
-import { workspacePath } from "./environment";
-
 import glob from 'glob';
 import { join } from "path";
+import { getGitHubContext } from './environment';
 
 export async function globSearch(pattern: string) {
+    let context = await getGitHubContext();
     return new Promise<string[]>((resolve, reject) => 
-        glob(join(workspacePath, pattern), {}, (err, files) => {
+        glob(join(context.environment.WORKSPACE, pattern), {}, (err, files) => {
             if(err)
                 return reject(err);
 
