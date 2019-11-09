@@ -5960,7 +5960,7 @@ async function gitCommand(cwd, args) {
 }
 async function gitCheckout() {
     let github = await environment_1.getGitHubContext();
-    await gitCommand(github.environment.WORKSPACE, ['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+    await gitCommand(github.environment.WORKSPACE, ['clone', '--recursive', `https://github.com/${github.owner.login}/${github.repository.name}.git`]);
     await gitCommand(path_1.join(github.environment.WORKSPACE, github.repository.name), ['submodule', 'update', '--init', '--recursive']);
 }
 async function run() {

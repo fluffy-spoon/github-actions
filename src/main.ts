@@ -14,10 +14,10 @@ async function gitCommand(cwd: string, args: string[]) {
 
 async function gitCheckout() {
     let github = await getGitHubContext();
-    
+
     await gitCommand(
         github.environment.WORKSPACE, 
-        ['clone', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
+        ['clone', '--recursive', `https://github.com/${github.owner.login}/${github.repository.name}.git`]);
     
     await gitCommand(
         join(github.environment.WORKSPACE, github.repository.name), 
