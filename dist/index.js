@@ -5297,11 +5297,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotnet_1 = __importDefault(__webpack_require__(216));
-const helpers_1 = __webpack_require__(872);
 async function run() {
     await dotnet_1.default();
 }
-run().catch((e) => Promise.reject(helpers_1.fail(e && e.toString())));
+run();
 exports.default = run;
 
 
