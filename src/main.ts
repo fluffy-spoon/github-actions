@@ -17,7 +17,7 @@ async function gitCheckout() {
 
     await gitCommand(
         github.environment.WORKSPACE, 
-        ['clone', '--recursive', `git@${github.owner.login}/${github.repository.name}.git`]);
+        ['clone', '--recursive', `https://${github.owner.login}:${github.token}@github.com/${github.owner.login}/${github.repository.name}.git`]);
     
     await gitCommand(
         join(github.environment.WORKSPACE, github.repository.name), 
